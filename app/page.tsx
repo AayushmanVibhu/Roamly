@@ -55,7 +55,7 @@ export default function Home() {
               based on your budget, preferences, and what matters most to you.
             </p>
             
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center relative z-10">
               <Link
                 href="/planner"
                 className="group bg-primary-600 text-white px-8 py-4 rounded-full hover:bg-primary-700 transition flex items-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
@@ -90,8 +90,8 @@ export default function Home() {
         </div>
 
         {/* Decorative Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-900/30 rounded-full filter blur-xl opacity-50 animate-pulse"></div>
-        <div className="absolute bottom-20 right-10 w-72 h-72 bg-blue-900/30 rounded-full filter blur-xl opacity-50 animate-pulse"></div>
+        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-900/30 rounded-full filter blur-xl opacity-50 animate-pulse pointer-events-none"></div>
+        <div className="absolute bottom-20 right-10 w-72 h-72 bg-blue-900/30 rounded-full filter blur-xl opacity-50 animate-pulse pointer-events-none"></div>
       </section>
 
       {/* Features Section */}
