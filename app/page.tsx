@@ -63,9 +63,12 @@ export default function Home() {
                 Plan Your Trip
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
               </Link>
-              <button className="text-dark-200 px-8 py-4 rounded-full hover:bg-dark-800 transition text-lg font-semibold border border-dark-700">
+              <Link
+                href="#how-it-works"
+                className="text-dark-200 px-8 py-4 rounded-full hover:bg-dark-800 transition text-lg font-semibold border border-dark-700"
+              >
                 See How It Works
-              </button>
+              </Link>
             </div>
 
             {/* Stats */}
