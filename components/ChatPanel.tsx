@@ -55,7 +55,7 @@ export default function ChatPanel({ messages, onSendMessage, onQuickConstraint, 
           <h2 className="text-lg font-semibold text-dark-50">AI Travel Assistant</h2>
         </div>
         <p className="text-sm text-dark-400">
-          Tell me about your trip and I'll help you find the best options
+          Tell me about your trip and I&apos;ll help you find the best options
         </p>
       </div>
 

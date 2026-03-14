@@ -76,7 +76,7 @@ export default function ResultsPage() {
           </div>
           <h2 className="text-2xl font-bold text-dark-50 mb-2">No trip details found</h2>
           <p className="text-dark-400 mb-6">
-            Let's start by telling me about your trip using our AI assistant!
+            Let&apos;s start by telling me about your trip using our AI assistant!
           </p>
           <Link
             href="/assistant"
