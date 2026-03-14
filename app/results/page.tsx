@@ -32,8 +32,11 @@ export default function ResultsPage() {
         setIsLoading(false)
       }
     } else {
-      // No preferences found, redirect to planner
-      router.push('/planner')
+      // No preferences found, redirect to assistant page
+      setIsLoading(false)
+      setTimeout(() => {
+        router.push('/assistant')
+      }, 2000)
     }
   }, [router])
 
@@ -51,12 +54,37 @@ export default function ResultsPage() {
     }
   }
 
-  if (isLoading || !preferences) {
+  if (isLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
         <div className="text-center">
           <div className="animate-spin w-16 h-16 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-          <p className="text-lg text-dark-300">Finding best travel options for you...</p>
+          <p className="text-lg text-dark-300">
+            {preferences ? 'Finding best travel options for you...' : 'Loading your preferences...'}
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (!preferences) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
+        <div className="text-center max-w-md">
+          <div className="bg-dark-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+            <Sparkles className="w-8 h-8 text-primary-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-dark-50 mb-2">No trip details found</h2>
+          <p className="text-dark-400 mb-6">
+            Let's start by telling me about your trip using our AI assistant!
+          </p>
+          <Link
+            href="/assistant"
+            className="inline-flex items-center gap-2 bg-primary-600 hover:bg-primary-700 text-white px-6 py-3 rounded-lg transition"
+          >
+            <Sparkles className="w-5 h-5" />
+            Start with AI Assistant
+          </Link>
         </div>
       </div>
     )
@@ -78,11 +106,17 @@ export default function ResultsPage() {
             </Link>
             <div className="flex items-center gap-4">
               <Link
-                href="/planner"
-                className="flex items-center gap-2 text-dark-300 hover:text-dark-50 transition"
+                href="/assistant"
+                className="flex items-center gap-2 text-dark-300 hover:text-dark-50 transition text-sm"
               >
                 <ArrowLeft className="w-4 h-4" />
                 New Search
+              </Link>
+              <Link
+                href="/planner"
+                className="text-dark-300 hover:text-dark-50 transition text-sm"
+              >
+                Classic Form
               </Link>
             </div>
           </div>

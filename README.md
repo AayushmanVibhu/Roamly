@@ -21,9 +21,25 @@ Roamly is not just another flight search engine. It's an intelligent travel comp
 ### Core Functionality
 
 - ✅ **Landing Page**: Beautiful, modern hero section with feature highlights
+- ✅ **AI Assistant**: Natural language chat interface for collecting travel preferences
 - ✅ **Trip Planner**: Comprehensive form for collecting user preferences
 - ✅ **Smart Recommendations**: AI-scored flight options with detailed analysis
 - ✅ **Dashboard**: Track your trips, savings, and search history
+
+### AI Assistant (NEW!)
+
+- 💬 **Natural Language Processing**: Extract travel constraints from conversational input
+- 🎯 **Live Constraint Tracking**: See your preferences update in real-time as you chat
+- ⚡ **Quick Actions**: One-click buttons for common preferences
+- 🔄 **Flexible Interaction**: Mix chat input with quick action buttons
+- 📊 **Visual Summary**: Organized view of all extracted constraints
+
+**Example queries the AI understands**:
+- "I want to fly from Phoenix to New York next month under $400 with one checked bag"
+- "Round trip from LA to Tokyo in December, business class"
+- "Nonstop flight from Chicago to Miami this weekend"
+
+See [AI_CONSTRAINT_EXTRACTION.md](docs/AI_CONSTRAINT_EXTRACTION.md) for full capabilities.
 
 ### Smart Features
 

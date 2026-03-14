@@ -107,3 +107,44 @@ export interface DashboardStats {
     date: string
   }>
 }
+
+// AI Chat Interface Types
+export interface QuickReply {
+  label: string
+  field: keyof TravelConstraints
+  value: any
+}
+
+export interface ChatMessage {
+  id: string
+  role: 'user' | 'assistant'
+  content: string
+  timestamp: Date
+  extractedConstraints?: Partial<TravelConstraints>
+  quickReplies?: QuickReply[]
+}
+
+// Simplified travel constraints for chat extraction
+export interface TravelConstraints {
+  origin?: string
+  destination?: string
+  departureDate?: string
+  returnDate?: string
+  tripType?: 'one-way' | 'round-trip'
+  budget?: number
+  passengers?: number
+  cabinClass?: 'economy' | 'premium-economy' | 'business' | 'first'
+  checkedBag?: boolean
+  nonstopOnly?: boolean
+  departureTimePreference?: 'morning' | 'afternoon' | 'evening' | 'night'
+  hotelNeeded?: boolean
+  flexibleDates?: boolean
+}
+
+export interface QuickConstraint {
+  id: string
+  label: string
+  icon: string
+  field: keyof TravelConstraints
+  value: any
+}

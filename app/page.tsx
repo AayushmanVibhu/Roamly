@@ -21,6 +21,9 @@ export default function Home() {
               <Link href="#how-it-works" className="text-dark-300 hover:text-dark-50 transition">
                 How It Works
               </Link>
+              <Link href="/assistant" className="text-dark-300 hover:text-dark-50 transition">
+                AI Assistant
+              </Link>
               <Link href="/dashboard" className="text-dark-300 hover:text-dark-50 transition">
                 Dashboard
               </Link>
@@ -57,17 +60,18 @@ export default function Home() {
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center items-center relative z-10">
               <Link
-                href="/planner"
-                className="group bg-primary-600 text-white px-8 py-4 rounded-full hover:bg-primary-700 transition flex items-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
+                href="/assistant"
+                className="group bg-gradient-to-r from-primary-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-primary-700 hover:to-purple-700 transition flex items-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
               >
-                Plan Your Trip
+                <Sparkles className="w-5 h-5" />
+                Try AI Assistant
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
               </Link>
               <Link
-                href="#how-it-works"
+                href="/planner"
                 className="text-dark-200 px-8 py-4 rounded-full hover:bg-dark-800 transition text-lg font-semibold border border-dark-700"
               >
-                See How It Works
+                Classic Form
               </Link>
             </div>
 
