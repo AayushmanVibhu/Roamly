@@ -46,7 +46,7 @@ export default function ResultsPage() {
       case 'score':
         return sorted.sort((a, b) => b.score.overall - a.score.overall)
       case 'price':
-        return sorted.sort((a, b) => a.flight.price.amount - b.flight.price.amount)
+        return sorted.sort((a, b) => a.flight.totalCost.estimatedTotal - b.flight.totalCost.estimatedTotal)
       case 'duration':
         return sorted.sort((a, b) => a.flight.totalDuration - b.flight.totalDuration)
       default:

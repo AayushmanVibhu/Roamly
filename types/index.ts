@@ -26,6 +26,59 @@ export interface TripPreferences {
   }
 }
 
+// Normalized constraints used across chat + form ingestion
+export interface NormalizedTripConstraints {
+  route: {
+    origin: string
+    destination: string
+  }
+  dates: {
+    departureDate: string
+    returnDate?: string
+    tripType: 'one-way' | 'round-trip'
+    flexibleDates: boolean
+  }
+  travelers: {
+    adults: number
+    children: number
+    infants: number
+    total: number
+  }
+  budget: {
+    maxBudget: number
+    currency: string
+  }
+  preferences: {
+    cabinClass: 'economy' | 'premium-economy' | 'business' | 'first'
+    checkedBag: boolean
+    nonstopOnly: boolean
+    departureTimePreferences: string[]
+    hotelNeeded: boolean
+  }
+}
+
+export type CostItemStatus = 'included' | 'extra' | 'unknown'
+export type CostConfidence = 'high' | 'medium' | 'low'
+
+export interface CostLineItem {
+  id: string
+  label: string
+  status: CostItemStatus
+  required: boolean
+  amount?: number
+  currency: string
+  description?: string
+}
+
+export interface TotalCostEstimate {
+  currency: string
+  headlineFare: number
+  estimatedTotal: number
+  potentialTotal: number
+  confidence: CostConfidence
+  lineItems: CostLineItem[]
+}
+
 // Flight segment
 export interface FlightSegment {
   id: string
@@ -48,6 +101,7 @@ export interface FlightOption {
     amount: number
     currency: string
   }
+  totalCost: TotalCostEstimate
   totalDuration: number // in minutes
   layoverCount: number
   layoverDurations: number[] // in minutes

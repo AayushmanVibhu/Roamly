@@ -5,7 +5,15 @@
  * Includes airline data, baggage costs, hotel estimates, and AI-powered explanations
  */
 
-import { TripPreferences, TravelRecommendation, FlightOption, TravelScore, FlightSegment } from '@/types'
+import {
+  CostLineItem,
+  FlightOption,
+  FlightSegment,
+  TotalCostEstimate,
+  TravelRecommendation,
+  TravelScore,
+  TripPreferences,
+} from '@/types'
 
 // ===== MOCK DATA =====
 
@@ -25,6 +33,7 @@ const BAGGAGE_COSTS = {
   firstChecked: 35,
   secondChecked: 45
 }
+const AIRLINES_WITH_INCLUDED_CHECKED_BAG = new Set(['Southwest'])
 
 // ===== MAIN RECOMMENDATION ENGINE =====
 
@@ -108,6 +117,7 @@ function generateSingleFlight(
   index: number
 ): FlightOption {
   const segments: FlightSegment[] = []
+  const includesCheckedBag = AIRLINES_WITH_INCLUDED_CHECKED_BAG.has(airline.name)
   
   // Determine departure time based on preferences or default
   const timePrefs = preferences.preferences.departureTimePreferences
@@ -171,10 +181,12 @@ function generateSingleFlight(
     })
   }
   
-  // Calculate pricing
+  const amenities = generateAmenities(airline.name, preferences.preferences.cabinClass)
+
+  // Calculate transparent total pricing
   const basePrice = calculateBasePrice(segments, airline, preferences, isNonstop)
-  const baggageCost = preferences.preferences.checkedBag ? BAGGAGE_COSTS.firstChecked : 0
-  const totalPrice = basePrice + baggageCost
+  const totalCost = buildTotalCostEstimate(basePrice, preferences, airline.name, amenities, includesCheckedBag)
+  const totalPrice = totalCost.estimatedTotal
   
   // Calculate total duration and layovers
   const totalDuration = segments.reduce((sum, seg) => sum + seg.duration, 0)
@@ -190,14 +202,15 @@ function generateSingleFlight(
       amount: Math.round(totalPrice),
       currency: preferences.currency
     },
+    totalCost,
     totalDuration,
     layoverCount,
     layoverDurations,
     baggage: {
       carryOn: 1,
-      checked: preferences.preferences.checkedBag ? 1 : 0
+      checked: includesCheckedBag ? 1 : 0
     },
-    amenities: generateAmenities(airline.name, preferences.preferences.cabinClass),
+    amenities,
     cancellationPolicy: totalPrice > 500 ? 'flexible' : totalPrice > 300 ? 'moderate' : 'strict'
   }
 }
@@ -233,6 +246,133 @@ function calculateBasePrice(
   return baseFare * cabinMultiplier * nonstopMultiplier * airlineMultiplier * variation
 }
 
+/**
+ * Build line-item total cost estimates and confidence levels.
+ */
+function buildTotalCostEstimate(
+  baseFareRaw: number,
+  preferences: TripPreferences,
+  airlineName: string,
+  amenities: string[],
+  includesCheckedBag: boolean
+): TotalCostEstimate {
+  const currency = preferences.currency
+  const baseFare = roundMoney(baseFareRaw)
+  const taxesAndGovFees = roundMoney(baseFare * (0.13 + Math.random() * 0.05))
+  const bookingFee = roundMoney(baseFare * 0.03)
+  const seatSelection = roundMoney(18 + Math.random() * 17)
+
+  const lineItems: CostLineItem[] = [
+    {
+      id: 'base-fare',
+      label: 'Base fare',
+      status: 'included',
+      required: true,
+      amount: baseFare,
+      currency,
+    },
+    {
+      id: 'taxes-fees',
+      label: 'Taxes & government fees',
+      status: 'included',
+      required: true,
+      amount: taxesAndGovFees,
+      currency,
+    },
+    {
+      id: 'service-fee',
+      label: 'Booking/service fee',
+      status: 'included',
+      required: true,
+      amount: bookingFee,
+      currency,
+    },
+    {
+      id: 'carry-on',
+      label: 'Carry-on bag',
+      status: 'included',
+      required: false,
+      amount: 0,
+      currency,
+      description: '1 carry-on typically included',
+    },
+  ]
+
+  if (preferences.preferences.checkedBag) {
+    lineItems.push({
+      id: 'checked-bag-required',
+      label: 'Checked bag',
+      status: includesCheckedBag ? 'included' : 'extra',
+      required: true,
+      amount: includesCheckedBag ? 0 : BAGGAGE_COSTS.firstChecked,
+      currency,
+      description: includesCheckedBag
+        ? `${airlineName} includes checked baggage`
+        : 'Added because you requested checked baggage',
+    })
+  } else {
+    lineItems.push({
+      id: 'checked-bag-optional',
+      label: 'Checked bag (optional)',
+      status: 'extra',
+      required: false,
+      amount: BAGGAGE_COSTS.firstChecked,
+      currency,
+    })
+  }
+
+  lineItems.push({
+    id: 'seat-selection',
+    label: 'Seat selection (optional)',
+    status: 'extra',
+    required: false,
+    amount: seatSelection,
+    currency,
+  })
+
+  if (!amenities.includes('WiFi')) {
+    lineItems.push({
+      id: 'wifi',
+      label: 'In-flight WiFi',
+      status: 'unknown',
+      required: false,
+      currency,
+      description: 'Airline-specific WiFi pricing can vary',
+    })
+  }
+
+  const estimatedTotal = lineItems.reduce((sum, item) => {
+    if (item.required && item.status !== 'unknown') {
+      return sum + (item.amount || 0)
+    }
+    if (item.id === 'base-fare') {
+      return sum + (item.amount || 0)
+    }
+    return sum
+  }, 0)
+
+  const potentialTotal = estimatedTotal + lineItems.reduce((sum, item) => {
+    if (!item.required && item.status === 'extra') {
+      return sum + (item.amount || 0)
+    }
+    return sum
+  }, 0)
+
+  const unknownRequiredCount = lineItems.filter(item => item.required && item.status === 'unknown').length
+  const unknownCount = lineItems.filter(item => item.status === 'unknown').length
+  const confidence: TotalCostEstimate['confidence'] =
+    unknownRequiredCount > 0 ? 'low' : unknownCount > 0 ? 'medium' : 'high'
+
+  return {
+    currency,
+    headlineFare: baseFare,
+    estimatedTotal: roundMoney(estimatedTotal),
+    potentialTotal: roundMoney(potentialTotal),
+    confidence,
+    lineItems,
+  }
+}
+
 // ===== SCORING ALGORITHM =====
 
 /**
@@ -240,7 +380,7 @@ function calculateBasePrice(
  */
 function calculateScore(flight: FlightOption, preferences: TripPreferences): TravelScore {
   // Individual score components (0-100)
-  const priceScore = calculatePriceScore(flight.price.amount, preferences.maxBudget)
+  const priceScore = calculatePriceScore(flight.totalCost.estimatedTotal, preferences.maxBudget)
   const convenienceScore = calculateConvenienceScore(flight, preferences)
   const comfortScore = calculateComfortScore(flight, preferences)
   const reliabilityScore = 85 + Math.random() * 10 // Mock: 85-95
@@ -271,7 +411,7 @@ function calculateScore(flight: FlightOption, preferences: TripPreferences): Tra
   })
   
   // Price analysis
-  const priceAnalysis = analyzePricing(flight.price.amount, preferences.maxBudget)
+  const priceAnalysis = analyzePricing(flight.totalCost.estimatedTotal, preferences.maxBudget)
   
   return {
     overall,
@@ -395,7 +535,7 @@ function generateInsights(
   }
   
   // Price insight
-  const savings = preferences.maxBudget - flight.price.amount
+  const savings = preferences.maxBudget - flight.totalCost.estimatedTotal
   if (savings > 100) {
     insights.push(`Great value - $${savings} under your maximum budget`)
   } else if (savings > 50) {
@@ -482,10 +622,17 @@ function generateExplanation(
   }
   
   // Price commentary
-  if (flight.price.amount < preferences.maxBudget * 0.65) {
-    parts.push(`At $${flight.price.amount}, it's an excellent value well within your budget.`)
-  } else if (flight.price.amount <= preferences.maxBudget) {
-    parts.push(`The $${flight.price.amount} price fits comfortably in your budget.`)
+  if (flight.totalCost.estimatedTotal < preferences.maxBudget * 0.65) {
+    parts.push(`At an estimated total of $${flight.totalCost.estimatedTotal}, it's an excellent value well within your budget.`)
+  } else if (flight.totalCost.estimatedTotal <= preferences.maxBudget) {
+    parts.push(`The estimated total of $${flight.totalCost.estimatedTotal} fits comfortably in your budget.`)
+  } else {
+    parts.push(`The estimated total is $${flight.totalCost.estimatedTotal}, which is above your target budget.`)
+  }
+
+  const unknownCosts = flight.totalCost.lineItems.filter(item => item.status === 'unknown')
+  if (unknownCosts.length > 0) {
+    parts.push(`Some costs are uncertain (${unknownCosts.map(item => item.label).join(', ')}) so treat this as an estimate.`)
   }
   
   // Travel time commentary
@@ -530,8 +677,9 @@ function generateTags(
   if (score.overall >= 85) tags.push('Recommended')
   
   // Price-based tags
-  if (flight.price.amount < preferences.maxBudget * 0.55) tags.push('Best Value')
+  if (flight.totalCost.estimatedTotal < preferences.maxBudget * 0.55) tags.push('Best Value')
   if (score.breakdown.price >= 95) tags.push('Great Price')
+  if (flight.totalCost.confidence === 'high') tags.push('Clear Pricing')
   
   // Feature-based tags
   if (flight.layoverCount === 0) tags.push('Non-Stop')
@@ -645,4 +793,8 @@ function generateAmenities(airline: string, cabinClass: string): string[] {
   }
   
   return amenities
+}
+
+function roundMoney(value: number): number {
+  return Math.round(value)
 }

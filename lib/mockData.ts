@@ -8,8 +8,65 @@ import {
   TravelRecommendation, 
   TravelScore,
   SavedTrip,
-  DashboardStats 
+  DashboardStats,
+  TotalCostEstimate,
 } from '@/types'
+
+function createMockTotalCost(estimatedTotal: number, currency: string, checkedBagIncluded: boolean): TotalCostEstimate {
+  const headlineFare = Math.round(estimatedTotal * 0.72)
+  const taxesAndFees = Math.round(estimatedTotal * 0.20)
+  const serviceFee = estimatedTotal - headlineFare - taxesAndFees
+
+  return {
+    currency,
+    headlineFare,
+    estimatedTotal,
+    potentialTotal: estimatedTotal + (checkedBagIncluded ? 25 : 60),
+    confidence: 'high',
+    lineItems: [
+      {
+        id: 'base-fare',
+        label: 'Base fare',
+        status: 'included',
+        required: true,
+        amount: headlineFare,
+        currency,
+      },
+      {
+        id: 'taxes-fees',
+        label: 'Taxes & government fees',
+        status: 'included',
+        required: true,
+        amount: taxesAndFees,
+        currency,
+      },
+      {
+        id: 'service-fee',
+        label: 'Booking/service fee',
+        status: 'included',
+        required: true,
+        amount: serviceFee,
+        currency,
+      },
+      {
+        id: checkedBagIncluded ? 'checked-bag-included' : 'checked-bag-optional',
+        label: 'Checked bag',
+        status: checkedBagIncluded ? 'included' : 'extra',
+        required: false,
+        amount: checkedBagIncluded ? 0 : 35,
+        currency,
+      },
+      {
+        id: 'seat-selection',
+        label: 'Seat selection (optional)',
+        status: 'extra',
+        required: false,
+        amount: 25,
+        currency,
+      },
+    ],
+  }
+}
 
 // Mock flight options
 export const mockFlightOptions: FlightOption[] = [
@@ -33,6 +90,7 @@ export const mockFlightOptions: FlightOption[] = [
       amount: 289,
       currency: 'USD'
     },
+    totalCost: createMockTotalCost(289, 'USD', false),
     totalDuration: 330,
     layoverCount: 0,
     layoverDurations: [],
@@ -75,6 +133,7 @@ export const mockFlightOptions: FlightOption[] = [
       amount: 245,
       currency: 'USD'
     },
+    totalCost: createMockTotalCost(245, 'USD', true),
     totalDuration: 585,
     layoverCount: 1,
     layoverDurations: [105],
@@ -105,6 +164,7 @@ export const mockFlightOptions: FlightOption[] = [
       amount: 312,
       currency: 'USD'
     },
+    totalCost: createMockTotalCost(312, 'USD', true),
     totalDuration: 345,
     layoverCount: 0,
     layoverDurations: [],
@@ -147,6 +207,7 @@ export const mockFlightOptions: FlightOption[] = [
       amount: 199,
       currency: 'USD'
     },
+    totalCost: createMockTotalCost(199, 'USD', false),
     totalDuration: 615,
     layoverCount: 1,
     layoverDurations: [225],

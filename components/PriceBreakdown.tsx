@@ -10,14 +10,12 @@ interface PriceBreakdownProps {
  * Shows detailed price breakdown for a flight option
  */
 export default function PriceBreakdown({ flight }: PriceBreakdownProps) {
-  // Calculate estimated taxes and fees (typically 15-20% of base fare)
-  const baseFare = Math.round(flight.price.amount * 0.75)
-  const taxes = Math.round(flight.price.amount * 0.15)
-  const fees = Math.round(flight.price.amount * 0.10)
-  
-  // Calculate potential additional costs
-  const checkedBagCost = flight.baggage.checked > 0 ? 0 : 35
-  const seatSelectionCost = 25
+  const { totalCost } = flight
+  const requiredItems = totalCost.lineItems.filter(item => item.required)
+  const optionalItems = totalCost.lineItems.filter(item => !item.required)
+  const unknownItems = totalCost.lineItems.filter(item => item.status === 'unknown')
+
+  const renderAmount = (amount?: number) => (typeof amount === 'number' ? `$${amount}` : '—')
 
   return (
     <div>
@@ -27,60 +25,71 @@ export default function PriceBreakdown({ flight }: PriceBreakdownProps) {
       </h4>
       
       <div className="bg-dark-750 rounded-lg p-4 space-y-2 text-sm border border-dark-700">
-        {/* Included in Price */}
-        <div className="font-medium text-dark-50 mb-2">Included:</div>
-        <div className="flex justify-between">
-          <span className="text-dark-300">Base Fare</span>
-          <span className="font-medium text-dark-100">${baseFare}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-dark-300">Taxes</span>
-          <span className="font-medium text-dark-100">${taxes}</span>
-        </div>
-        <div className="flex justify-between">
-          <span className="text-dark-300">Booking Fees</span>
-          <span className="font-medium text-dark-100">${fees}</span>
-        </div>
-        {flight.baggage.checked > 0 && (
-          <div className="flex justify-between text-green-700">
-            <span>Checked Bag (1)</span>
-            <span className="font-medium">Included ✓</span>
+        <div className="font-medium text-dark-50 mb-2">Estimated Required Costs:</div>
+        {requiredItems.map((item) => (
+          <div key={item.id} className="flex justify-between">
+            <span className="text-dark-300">{item.label}</span>
+            <span
+              className={`font-medium ${
+                item.status === 'included'
+                  ? 'text-green-500'
+                  : item.status === 'extra'
+                    ? 'text-dark-100'
+                    : 'text-yellow-400'
+              }`}
+            >
+              {item.status === 'included' && item.amount === 0 ? 'Included ✓' : renderAmount(item.amount)}
+            </span>
           </div>
-        )}
+        ))}
         
         <div className="border-t pt-2 mt-2 flex justify-between text-base font-bold">
-          <span className="text-dark-50">Total Price</span>
-          <span className="text-primary-400">${flight.price.amount}</span>
+          <span className="text-dark-50">Estimated Total</span>
+          <span className="text-primary-400">${totalCost.estimatedTotal}</span>
         </div>
 
-        {/* Potential Additional Costs */}
+        <div className="flex justify-between text-xs text-dark-400">
+          <span>Headline fare</span>
+          <span>${totalCost.headlineFare}</span>
+        </div>
+
         <div className="border-t border-dark-700 pt-3 mt-3">
-          <div className="font-medium text-dark-50 mb-2">Potential Add-ons:</div>
-          {flight.baggage.checked === 0 && (
-            <div className="flex justify-between text-dark-300">
-              <span>Checked Bag (optional)</span>
-              <span>+${checkedBagCost}</span>
+          <div className="font-medium text-dark-50 mb-2">Optional / Variable Costs:</div>
+          {optionalItems.map((item) => (
+            <div key={item.id} className="flex justify-between text-dark-300">
+              <span>{item.label}</span>
+              <span>
+                {item.status === 'unknown' ? 'Unknown' : `+$${item.amount || 0}`}
+              </span>
             </div>
-          )}
-          <div className="flex justify-between text-dark-300">
-            <span>Seat Selection (optional)</span>
-            <span>+${seatSelectionCost}</span>
+          ))}
+          <div className="flex justify-between text-xs text-dark-400 mt-2">
+            <span>Potential total with common add-ons</span>
+            <span>${totalCost.potentialTotal}</span>
           </div>
         </div>
 
-        {/* Price per mile */}
+        {unknownItems.length > 0 && (
+          <div className="text-xs text-yellow-300 bg-yellow-900/20 border border-yellow-700/30 rounded-md px-2 py-1">
+            Some costs are marked unknown and may vary at checkout.
+          </div>
+        )}
+
         <div className="border-t border-dark-700 pt-2 mt-2">
           <div className="flex justify-between text-xs text-dark-400">
             <span>Cost per hour of flight</span>
-            <span>${Math.round(flight.price.amount / (flight.totalDuration / 60))}/hr</span>
+            <span>${Math.round(totalCost.estimatedTotal / (flight.totalDuration / 60))}/hr</span>
+          </div>
+          <div className="flex justify-between text-xs text-dark-400 mt-1">
+            <span>Pricing confidence</span>
+            <span className="capitalize">{totalCost.confidence}</span>
           </div>
         </div>
       </div>
 
       {/* Savings Tip */}
       <div className="mt-3 p-3 bg-primary-900/20 border border-primary-700/30 rounded-lg text-xs text-primary-300">
-        💡 <strong>Tip:</strong> Booking this flight now could save you an estimated $45-80 
-        compared to waiting closer to departure.
+        💡 <strong>Tip:</strong> Compare estimated total, not just headline fare, to avoid checkout surprises.
       </div>
     </div>
   )

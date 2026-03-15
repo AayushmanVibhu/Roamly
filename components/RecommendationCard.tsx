@@ -141,8 +141,11 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
               
               <div className="mt-4">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl font-bold text-dark-50">${flight.price.amount}</span>
+                  <span className="text-3xl font-bold text-dark-50">${flight.totalCost.estimatedTotal}</span>
                   <span className="text-dark-300">per person</span>
+                </div>
+                <div className="text-xs text-dark-400 mt-1">
+                  Headline fare ${flight.totalCost.headlineFare} • Pricing confidence: {flight.totalCost.confidence}
                 </div>
                 
                 <div className="flex items-center gap-2 mt-2 text-sm">

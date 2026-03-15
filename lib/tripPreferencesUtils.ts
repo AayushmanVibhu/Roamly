@@ -1,4 +1,4 @@
-import { TravelConstraints, TripPreferences } from '@/types'
+import { NormalizedTripConstraints, TravelConstraints, TripPreferences } from '@/types'
 
 /**
  * Convert chatbot TravelConstraints to TripPreferences for the recommendation engine
@@ -100,4 +100,53 @@ export function loadTripPreferences(): TripPreferences | null {
  */
 export function clearTripPreferences(): void {
   sessionStorage.removeItem('tripPreferences')
+}
+
+/**
+ * Normalize TripPreferences into one canonical shape used by matching, scoring, and agents.
+ */
+export function normalizeTripPreferences(preferences: TripPreferences): NormalizedTripConstraints {
+  const totalTravelers =
+    preferences.passengers.adults +
+    preferences.passengers.children +
+    preferences.passengers.infants
+
+  return {
+    route: {
+      origin: preferences.origin,
+      destination: preferences.destination,
+    },
+    dates: {
+      departureDate: preferences.departureDate,
+      returnDate: preferences.returnDate,
+      tripType: preferences.tripType,
+      flexibleDates: preferences.flexibleDates,
+    },
+    travelers: {
+      adults: preferences.passengers.adults,
+      children: preferences.passengers.children,
+      infants: preferences.passengers.infants,
+      total: totalTravelers,
+    },
+    budget: {
+      maxBudget: preferences.maxBudget,
+      currency: preferences.currency,
+    },
+    preferences: {
+      cabinClass: preferences.preferences.cabinClass,
+      checkedBag: preferences.preferences.checkedBag,
+      nonstopOnly: preferences.preferences.nonstopOnly,
+      departureTimePreferences: preferences.preferences.departureTimePreferences,
+      hotelNeeded: preferences.preferences.hotelNeeded,
+    },
+  }
+}
+
+/**
+ * Normalize chat constraints by first converting to TripPreferences.
+ */
+export function normalizeTravelConstraints(constraints: TravelConstraints): NormalizedTripConstraints | null {
+  const preferences = convertConstraintsToPreferences(constraints)
+  if (!preferences) return null
+  return normalizeTripPreferences(preferences)
 }
