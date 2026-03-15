@@ -40,6 +40,7 @@ Roamly is not just another flight search engine. It's an intelligent travel comp
 - "Nonstop flight from Chicago to Miami this weekend"
 
 See [AI_CONSTRAINT_EXTRACTION.md](docs/AI_CONSTRAINT_EXTRACTION.md) for full capabilities.
+See [MVP_SCOPE.md](docs/MVP_SCOPE.md) for the current product scope and definition of done.
 
 ### Smart Features
 
