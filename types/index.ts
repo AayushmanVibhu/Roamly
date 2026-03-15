@@ -79,6 +79,29 @@ export interface TotalCostEstimate {
   lineItems: CostLineItem[]
 }
 
+export type ConstraintKey =
+  | 'budget'
+  | 'nonstop'
+  | 'checkedBag'
+  | 'cabinClass'
+  | 'departureTime'
+
+export interface ConstraintMatchItem {
+  key: ConstraintKey
+  label: string
+  expectedValue: string
+  actualValue: string
+  reason: string
+}
+
+export interface ConstraintMatchSummary {
+  isFullMatch: boolean
+  matchedCount: number
+  totalChecked: number
+  matchedConstraints: ConstraintMatchItem[]
+  missedConstraints: ConstraintMatchItem[]
+}
+
 // Flight segment
 export interface FlightSegment {
   id: string
@@ -136,6 +159,7 @@ export interface TravelScore {
 export interface TravelRecommendation {
   flight: FlightOption
   score: TravelScore
+  constraintMatch: ConstraintMatchSummary
   tags: string[] // e.g., "Best Value", "Fastest", "Most Comfortable"
   aiSummary: string
   alternativeOptions?: string[]

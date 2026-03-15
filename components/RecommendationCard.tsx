@@ -5,7 +5,6 @@ import { TravelRecommendation } from '@/types'
 import { 
   Plane, 
   Clock, 
-  DollarSign, 
   Luggage, 
   ChevronDown, 
   ChevronUp,
@@ -13,7 +12,9 @@ import {
   TrendingUp,
   Minus,
   Award,
-  Sparkles
+  Sparkles,
+  CheckCircle2,
+  AlertTriangle
 } from 'lucide-react'
 import TravelScoreBadge from './TravelScoreBadge'
 import PriceBreakdown from './PriceBreakdown'
@@ -29,7 +30,7 @@ interface RecommendationCardProps {
  */
 export default function RecommendationCard({ recommendation, rank }: RecommendationCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { flight, score, tags, aiSummary } = recommendation
+  const { flight, score, tags, aiSummary, constraintMatch } = recommendation
 
   // Format duration from minutes to hours and minutes
   const formatDuration = (minutes: number) => {
@@ -65,6 +66,17 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
       <div className="p-6">
         {/* Header with Tags */}
         <div className="flex flex-wrap gap-2 mb-4">
+          <span
+            className={`px-3 py-1 rounded-full text-xs font-medium border ${
+              constraintMatch.isFullMatch
+                ? 'bg-green-900/20 text-green-400 border-green-700/40'
+                : 'bg-yellow-900/20 text-yellow-300 border-yellow-700/40'
+            }`}
+          >
+            {constraintMatch.isFullMatch
+              ? 'Full Match'
+              : `Partial Match (${constraintMatch.missedConstraints.length} missed)`}
+          </span>
           {tags.map((tag) => (
             <span
               key={tag}
@@ -200,6 +212,41 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
         {/* Expanded Content */}
         {isExpanded && (
           <div className="mt-6 pt-6 border-t space-y-6">
+            {/* Constraint Match */}
+            <div>
+              <h4 className="font-semibold text-dark-50 mb-3">Constraint Match</h4>
+              <div className="text-sm text-dark-300 mb-3">
+                Matched {constraintMatch.matchedCount}/{constraintMatch.totalChecked} checked constraints
+              </div>
+
+              {constraintMatch.missedConstraints.length > 0 ? (
+                <div className="space-y-2">
+                  {constraintMatch.missedConstraints.map((item) => (
+                    <div
+                      key={`missed-${item.key}`}
+                      className="bg-yellow-900/20 border border-yellow-700/30 rounded-lg p-3"
+                    >
+                      <div className="flex items-start gap-2">
+                        <AlertTriangle className="w-4 h-4 text-yellow-300 mt-0.5 flex-shrink-0" />
+                        <div className="text-sm">
+                          <div className="text-yellow-200 font-medium">{item.label}</div>
+                          <div className="text-yellow-100/90">{item.reason}</div>
+                          <div className="text-xs text-yellow-100/70 mt-1">
+                            Expected: {item.expectedValue} • Actual: {item.actualValue}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="bg-green-900/20 border border-green-700/30 rounded-lg p-3 text-sm text-green-300 flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4" />
+                  All checked constraints are satisfied.
+                </div>
+              )}
+            </div>
+
             {/* Score Breakdown */}
             <div>
               <h4 className="font-semibold text-dark-50 mb-4">Travel Score Breakdown</h4>

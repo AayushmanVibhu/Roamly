@@ -4,6 +4,7 @@
  */
 
 import { 
+  ConstraintMatchSummary,
   FlightOption, 
   TravelRecommendation, 
   TravelScore,
@@ -319,6 +320,7 @@ export const mockTravelScores: Record<string, TravelScore> = {
 export const mockRecommendations: TravelRecommendation[] = mockFlightOptions.map(flight => ({
   flight,
   score: mockTravelScores[flight.id],
+  constraintMatch: getConstraintMatch(flight.id),
   tags: getTags(flight.id),
   aiSummary: getAISummary(flight.id),
   alternativeOptions: []
@@ -342,6 +344,73 @@ function getAISummary(flightId: string): string {
     'FL004': 'The budget option that requires trade-offs. You\'ll save $90, but face a very early departure and long layover. No checked bag is included, and cancellation terms are strict. Best for experienced travelers comfortable with early mornings and self-packing light.'
   }
   return summaryMap[flightId] || ''
+}
+
+function getConstraintMatch(flightId: string): ConstraintMatchSummary {
+  const map: Record<string, ConstraintMatchSummary> = {
+    FL001: {
+      isFullMatch: true,
+      matchedCount: 5,
+      totalChecked: 5,
+      matchedConstraints: [
+        { key: 'budget', label: 'Budget', expectedValue: 'Under $500', actualValue: '$289', reason: 'Within budget by $211' },
+        { key: 'nonstop', label: 'Nonstop', expectedValue: 'Nonstop only', actualValue: 'Nonstop', reason: 'Nonstop requirement satisfied' },
+        { key: 'checkedBag', label: 'Checked bag', expectedValue: 'No checked bag required', actualValue: 'Carry-on only', reason: 'Baggage preference matched' },
+        { key: 'cabinClass', label: 'Cabin class', expectedValue: 'Economy', actualValue: 'Economy', reason: 'Cabin class preference matched' },
+        { key: 'departureTime', label: 'Departure time', expectedValue: 'morning', actualValue: 'morning', reason: 'Departure time aligns with your preference' },
+      ],
+      missedConstraints: [],
+    },
+    FL002: {
+      isFullMatch: false,
+      matchedCount: 4,
+      totalChecked: 5,
+      matchedConstraints: [
+        { key: 'budget', label: 'Budget', expectedValue: 'Under $500', actualValue: '$245', reason: 'Within budget by $255' },
+        { key: 'checkedBag', label: 'Checked bag', expectedValue: 'No checked bag required', actualValue: 'Included', reason: 'Baggage preference matched' },
+        { key: 'cabinClass', label: 'Cabin class', expectedValue: 'Economy', actualValue: 'Economy', reason: 'Cabin class preference matched' },
+        { key: 'departureTime', label: 'Departure time', expectedValue: 'morning', actualValue: 'morning', reason: 'Departure time aligns with your preference' },
+      ],
+      missedConstraints: [
+        { key: 'nonstop', label: 'Nonstop', expectedValue: 'Nonstop only', actualValue: '1 stop', reason: 'Includes layover(s), which conflicts with nonstop preference' },
+      ],
+    },
+    FL003: {
+      isFullMatch: true,
+      matchedCount: 5,
+      totalChecked: 5,
+      matchedConstraints: [
+        { key: 'budget', label: 'Budget', expectedValue: 'Under $500', actualValue: '$312', reason: 'Within budget by $188' },
+        { key: 'nonstop', label: 'Nonstop', expectedValue: 'Nonstop only', actualValue: 'Nonstop', reason: 'Nonstop requirement satisfied' },
+        { key: 'checkedBag', label: 'Checked bag', expectedValue: 'No checked bag required', actualValue: 'Included', reason: 'Baggage preference matched' },
+        { key: 'cabinClass', label: 'Cabin class', expectedValue: 'Economy', actualValue: 'Economy', reason: 'Cabin class preference matched' },
+        { key: 'departureTime', label: 'Departure time', expectedValue: 'afternoon', actualValue: 'afternoon', reason: 'Departure time aligns with your preference' },
+      ],
+      missedConstraints: [],
+    },
+    FL004: {
+      isFullMatch: false,
+      matchedCount: 3,
+      totalChecked: 5,
+      matchedConstraints: [
+        { key: 'budget', label: 'Budget', expectedValue: 'Under $500', actualValue: '$199', reason: 'Within budget by $301' },
+        { key: 'checkedBag', label: 'Checked bag', expectedValue: 'No checked bag required', actualValue: 'Carry-on only', reason: 'Baggage preference matched' },
+        { key: 'cabinClass', label: 'Cabin class', expectedValue: 'Economy', actualValue: 'Economy', reason: 'Cabin class preference matched' },
+      ],
+      missedConstraints: [
+        { key: 'nonstop', label: 'Nonstop', expectedValue: 'Nonstop only', actualValue: '1 stop', reason: 'Includes layover(s), which conflicts with nonstop preference' },
+        { key: 'departureTime', label: 'Departure time', expectedValue: 'morning', actualValue: 'early-morning', reason: 'Departure time is outside your preferred window' },
+      ],
+    },
+  }
+
+  return map[flightId] || {
+    isFullMatch: false,
+    matchedCount: 0,
+    totalChecked: 0,
+    matchedConstraints: [],
+    missedConstraints: [],
+  }
 }
 
 // Mock saved trips

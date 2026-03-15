@@ -44,7 +44,11 @@ export default function ResultsPage() {
     const sorted = [...recommendations]
     switch (sortBy) {
       case 'score':
-        return sorted.sort((a, b) => b.score.overall - a.score.overall)
+        return sorted.sort((a, b) => {
+          const fullMatchDelta = Number(b.constraintMatch.isFullMatch) - Number(a.constraintMatch.isFullMatch)
+          if (fullMatchDelta !== 0) return fullMatchDelta
+          return b.score.overall - a.score.overall
+        })
       case 'price':
         return sorted.sort((a, b) => a.flight.totalCost.estimatedTotal - b.flight.totalCost.estimatedTotal)
       case 'duration':

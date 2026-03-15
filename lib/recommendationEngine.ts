@@ -6,6 +6,8 @@
  */
 
 import {
+  ConstraintMatchItem,
+  ConstraintMatchSummary,
   CostLineItem,
   FlightOption,
   FlightSegment,
@@ -47,21 +49,27 @@ export function generateRecommendations(preferences: TripPreferences): TravelRec
   
   // Step 2: Score each option
   const recommendations: TravelRecommendation[] = flightOptions.map(flight => {
+    const constraintMatch = evaluateConstraintMatch(flight, preferences)
     const score = calculateScore(flight, preferences)
-    const explanation = generateExplanation(flight, score, preferences)
-    const tags = generateTags(flight, score, preferences)
+    const explanation = generateExplanation(flight, score, preferences, constraintMatch)
+    const tags = generateTags(flight, score, preferences, constraintMatch)
     
     return {
       flight,
       score,
+      constraintMatch,
       tags,
       aiSummary: explanation,
       alternativeOptions: []
     }
   })
   
-  // Step 3: Sort by overall score (highest first)
-  const sorted = recommendations.sort((a, b) => b.score.overall - a.score.overall)
+  // Step 3: Sort by match quality first, then overall score
+  const sorted = recommendations.sort((a, b) => {
+    const fullMatchDelta = Number(b.constraintMatch.isFullMatch) - Number(a.constraintMatch.isFullMatch)
+    if (fullMatchDelta !== 0) return fullMatchDelta
+    return b.score.overall - a.score.overall
+  })
   
   // Step 4: Add hotel estimates if needed
   if (preferences.preferences.hotelNeeded && preferences.returnDate) {
@@ -600,23 +608,128 @@ function analyzePricing(price: number, maxBudget: number): TravelScore['priceAna
 
 // ===== EXPLANATION GENERATION =====
 
+function evaluateConstraintMatch(
+  flight: FlightOption,
+  preferences: TripPreferences
+): ConstraintMatchSummary {
+  const matchedConstraints: ConstraintMatchItem[] = []
+  const missedConstraints: ConstraintMatchItem[] = []
+
+  const addResult = (
+    matched: boolean,
+    item: ConstraintMatchItem
+  ) => {
+    if (matched) {
+      matchedConstraints.push(item)
+    } else {
+      missedConstraints.push(item)
+    }
+  }
+
+  // Budget match
+  const budgetGap = preferences.maxBudget - flight.totalCost.estimatedTotal
+  addResult(budgetGap >= 0, {
+    key: 'budget',
+    label: 'Budget',
+    expectedValue: `Under $${preferences.maxBudget}`,
+    actualValue: `$${flight.totalCost.estimatedTotal}`,
+    reason:
+      budgetGap >= 0
+        ? `Within budget by $${budgetGap}`
+        : `Over budget by $${Math.abs(budgetGap)}`,
+  })
+
+  // Nonstop preference
+  if (preferences.preferences.nonstopOnly) {
+    addResult(flight.layoverCount === 0, {
+      key: 'nonstop',
+      label: 'Nonstop',
+      expectedValue: 'Nonstop only',
+      actualValue: flight.layoverCount === 0 ? 'Nonstop' : `${flight.layoverCount} stop(s)`,
+      reason:
+        flight.layoverCount === 0
+          ? 'Nonstop requirement satisfied'
+          : 'Includes layover(s), which conflicts with nonstop preference',
+    })
+  }
+
+  // Checked bag preference
+  if (preferences.preferences.checkedBag) {
+    const checkedBagLine = flight.totalCost.lineItems.find(item => item.id.includes('checked-bag'))
+    const isKnown = checkedBagLine?.status !== 'unknown'
+    const bagDetail =
+      checkedBagLine?.status === 'included'
+        ? 'Included'
+        : checkedBagLine?.status === 'extra'
+          ? `Available for +$${checkedBagLine.amount || 0}`
+          : 'Unknown availability'
+    addResult(Boolean(isKnown), {
+      key: 'checkedBag',
+      label: 'Checked bag',
+      expectedValue: 'Checked bag needed',
+      actualValue: bagDetail,
+      reason: isKnown
+        ? 'Checked baggage is available and included in cost estimate'
+        : 'Checked baggage cost/availability is uncertain',
+    })
+  }
+
+  // Cabin class
+  const actualCabinClass = flight.segments[0]?.class || 'economy'
+  addResult(actualCabinClass === preferences.preferences.cabinClass, {
+    key: 'cabinClass',
+    label: 'Cabin class',
+    expectedValue: formatCabinClass(preferences.preferences.cabinClass),
+    actualValue: formatCabinClass(actualCabinClass),
+    reason:
+      actualCabinClass === preferences.preferences.cabinClass
+        ? 'Cabin class preference matched'
+        : 'Different cabin class than requested',
+  })
+
+  // Departure time preference
+  if (preferences.preferences.departureTimePreferences.length > 0) {
+    const departureHour = new Date(flight.segments[0].departureTime).getHours()
+    const actualTimeCategory = getTimeCategory(departureHour)
+    const hasMatch = preferences.preferences.departureTimePreferences.includes(actualTimeCategory)
+    addResult(hasMatch, {
+      key: 'departureTime',
+      label: 'Departure time',
+      expectedValue: preferences.preferences.departureTimePreferences.join(' or '),
+      actualValue: actualTimeCategory,
+      reason: hasMatch
+        ? 'Departure time aligns with your preference'
+        : 'Departure time is outside your preferred window',
+    })
+  }
+
+  return {
+    isFullMatch: missedConstraints.length === 0,
+    matchedCount: matchedConstraints.length,
+    totalChecked: matchedConstraints.length + missedConstraints.length,
+    matchedConstraints,
+    missedConstraints,
+  }
+}
+
 /**
  * Generate natural language explanation for why this option is recommended
  */
 function generateExplanation(
   flight: FlightOption,
   score: TravelScore,
-  preferences: TripPreferences
+  preferences: TripPreferences,
+  constraintMatch: ConstraintMatchSummary
 ): string {
   const parts: string[] = []
   
   // Opening statement based on score
-  if (score.overall >= 90) {
+  if (constraintMatch.isFullMatch && score.overall >= 90) {
     parts.push('This is an excellent match for your preferences.')
-  } else if (score.overall >= 80) {
+  } else if (constraintMatch.isFullMatch && score.overall >= 80) {
     parts.push('This is a great option that balances value and convenience well.')
   } else if (score.overall >= 70) {
-    parts.push('This option offers good value with some trade-offs.')
+    parts.push('This option offers good value with some trade-offs against your constraints.')
   } else {
     parts.push('This budget-friendly option requires compromises.')
   }
@@ -633,6 +746,14 @@ function generateExplanation(
   const unknownCosts = flight.totalCost.lineItems.filter(item => item.status === 'unknown')
   if (unknownCosts.length > 0) {
     parts.push(`Some costs are uncertain (${unknownCosts.map(item => item.label).join(', ')}) so treat this as an estimate.`)
+  }
+
+  if (constraintMatch.missedConstraints.length > 0) {
+    const topMisses = constraintMatch.missedConstraints
+      .slice(0, 2)
+      .map(item => `${item.label}: ${item.reason}`)
+      .join(' ')
+    parts.push(`Constraint trade-offs: ${topMisses}`)
   }
   
   // Travel time commentary
@@ -668,9 +789,16 @@ function generateExplanation(
 function generateTags(
   flight: FlightOption,
   score: TravelScore,
-  preferences: TripPreferences
+  preferences: TripPreferences,
+  constraintMatch: ConstraintMatchSummary
 ): string[] {
   const tags: string[] = []
+
+  if (constraintMatch.isFullMatch) {
+    tags.push('Full Match')
+  } else {
+    tags.push('Partial Match')
+  }
   
   // Score-based tags
   if (score.overall >= 90) tags.push('Best Overall')
@@ -797,4 +925,11 @@ function generateAmenities(airline: string, cabinClass: string): string[] {
 
 function roundMoney(value: number): number {
   return Math.round(value)
+}
+
+function formatCabinClass(cabinClass: string): string {
+  return cabinClass
+    .split('-')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ')
 }
