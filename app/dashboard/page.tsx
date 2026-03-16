@@ -2,17 +2,15 @@
 
 import Link from 'next/link'
 import { Plane, TrendingUp, Clock, Award, Plus, ArrowRight, DollarSign } from 'lucide-react'
-import { mockDashboardStats, mockSavedTrips } from '@/lib/mockData'
-import TravelScoreBadge from '@/components/TravelScoreBadge'
 
 export default function DashboardPage() {
-  const stats = mockDashboardStats
-  const savedTrips = mockSavedTrips
-
-  const formatDate = (isoString: string) => {
-    const date = new Date(isoString)
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
+  const stats = {
+    totalTripsPlanned: 0,
+    totalSaved: 0,
+    averageScore: 0,
+    recentSearches: [] as Array<{ id: string; route: string; date: string }>,
   }
+  const savedTrips: Array<never> = []
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
@@ -61,9 +59,9 @@ export default function DashboardPage() {
                 <div className="text-sm text-dark-300">Trips Planned</div>
               </div>
             </div>
-            <div className="text-xs text-green-600 flex items-center gap-1">
+            <div className="text-xs text-dark-300 flex items-center gap-1">
               <TrendingUp className="w-3 h-3" />
-              <span>+3 this month</span>
+              <span>No trips yet</span>
             </div>
           </div>
 
@@ -129,83 +127,21 @@ export default function DashboardPage() {
             </Link>
           </div>
 
-          <div className="space-y-4">
-            {savedTrips.map((trip) => (
-              <div key={trip.id} className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6 hover:shadow-md transition">
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="text-xl font-bold text-dark-50">
-                        {trip.preferences.origin} → {trip.preferences.destination}
-                      </h3>
-                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
-                        trip.status === 'planning' 
-                          ? 'bg-blue-900/30 text-blue-700'
-                          : trip.status === 'booked'
-                          ? 'bg-green-900/30 text-green-700'
-                          : 'bg-dark-800 border border-dark-700 text-dark-200'
-                      }`}>
-                        {trip.status.charAt(0).toUpperCase() + trip.status.slice(1)}
-                      </span>
-                    </div>
-                    <div className="flex flex-wrap gap-4 text-sm text-dark-300">
-                      <span className="flex items-center gap-1">
-                        <Calendar className="w-4 h-4" />
-                        {formatDate(trip.preferences.departureDate)}
-                        {trip.preferences.returnDate && ` - ${formatDate(trip.preferences.returnDate)}`}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Users className="w-4 h-4" />
-                        {trip.preferences.passengers.adults + trip.preferences.passengers.children + trip.preferences.passengers.infants} passenger(s)
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <DollarSign className="w-4 h-4" />
-                        Budget: Up to ${trip.preferences.maxBudget}
-                      </span>
-                    </div>
-                    <div className="mt-3 text-sm text-dark-300">
-                      {trip.recommendations.length} options found • Created {formatDate(trip.createdAt)}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    {trip.recommendations[0] && (
-                      <TravelScoreBadge 
-                        score={trip.recommendations[0].score.overall} 
-                        size="small"
-                        showLabel={false}
-                      />
-                    )}
-                    <Link
-                      href="/results"
-                      className="flex items-center gap-2 text-primary-400 hover:text-primary-300 font-medium transition"
-                    >
-                      View Options
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                </div>
-              </div>
-            ))}
-          </div>
+          {savedTrips.length === 0 && (
+            <div className="bg-dark-800 border border-dark-700 rounded-xl p-8 text-center text-dark-300">
+              No saved trips yet. Start a search to create your first trip.
+            </div>
+          )}
         </div>
 
         {/* Recent Searches */}
         <div>
           <h2 className="text-2xl font-bold text-dark-50 mb-6">Recent Searches</h2>
-          <div className="grid md:grid-cols-3 gap-4">
-            {stats.recentSearches.map((search) => (
-              <div key={search.id} className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-4 hover:shadow-md transition cursor-pointer">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <div className="font-semibold text-dark-50">{search.route}</div>
-                    <div className="text-sm text-dark-300">{formatDate(search.date)}</div>
-                  </div>
-                  <Clock className="w-5 h-5 text-dark-400" />
-                </div>
-              </div>
-            ))}
-          </div>
+          {stats.recentSearches.length === 0 ? (
+            <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 text-dark-300">
+              No recent searches yet.
+            </div>
+          ) : null}
         </div>
 
         {/* Quick Actions */}
@@ -226,6 +162,3 @@ export default function DashboardPage() {
     </div>
   )
 }
-
-// Import icons that were missing
-import { Calendar, Users } from 'lucide-react'

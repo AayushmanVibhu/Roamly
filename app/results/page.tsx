@@ -38,7 +38,10 @@ export default function ResultsPage() {
 
         setRecommendations(payload.recommendations || [])
         if ((payload.recommendations || []).length === 0) {
-          setErrorMessage('No live offers matched this search right now. Try flexible dates or a higher budget.')
+          setErrorMessage(
+            payload?.message ||
+              'Option is not available for the selected constraints right now. Try flexible dates or a higher budget.'
+          )
         }
       } catch (error) {
         console.error('Error generating recommendations:', error)
