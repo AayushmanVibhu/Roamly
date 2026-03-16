@@ -14,6 +14,7 @@ export default function ResultsPage() {
   const [sortBy, setSortBy] = useState<'score' | 'price' | 'duration'>('score')
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const [dataSource, setDataSource] = useState<string>('unknown')
 
   useEffect(() => {
     let isMounted = true
@@ -37,6 +38,7 @@ export default function ResultsPage() {
         if (!isMounted) return
 
         setRecommendations(payload.recommendations || [])
+        setDataSource(payload.source || 'unknown')
         if ((payload.recommendations || []).length === 0) {
           setErrorMessage(
             payload?.message ||
@@ -169,6 +171,12 @@ export default function ResultsPage() {
           <div className="flex items-center gap-2 text-sm text-dark-300 mb-4">
             <Sparkles className="w-4 h-4 text-primary-600" />
             <span>AI-Powered Recommendations</span>
+          </div>
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-green-700/40 bg-green-900/20 text-green-300 text-xs mb-3">
+            <span>Live source: {dataSource}</span>
+            {sortedRecommendations[0]?.flight?.id && (
+              <span className="opacity-80">• {sortedRecommendations[0].flight.id}</span>
+            )}
           </div>
           <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">
             Best Options for Your Trip
