@@ -1,6 +1,7 @@
 import { CostLineItem, FlightOption, FlightSegment, TotalCostEstimate, TripPreferences } from '@/types'
 
 const SERPAPI_BASE_URL = 'https://serpapi.com/search.json'
+const DEFAULT_OPTIONAL_UNKNOWN_ESTIMATE = 25
 
 interface SerpApiResponse {
   best_flights?: SerpFlightOffer[]
@@ -69,35 +70,86 @@ const SERP_METRO_FALLBACKS: Record<string, string> = {
   WAS: 'IAD',
 }
 
+const AIRPORT_CANDIDATE_GROUPS: Record<string, string[]> = {
+  JFK: ['JFK', 'EWR', 'LGA'],
+  EWR: ['EWR', 'JFK', 'LGA'],
+  LGA: ['LGA', 'JFK', 'EWR'],
+  LHR: ['LHR', 'LGW'],
+  LGW: ['LGW', 'LHR'],
+  ORD: ['ORD', 'MDW'],
+  IAD: ['IAD', 'DCA', 'BWI'],
+  DCA: ['DCA', 'IAD', 'BWI'],
+  NRT: ['NRT', 'HND'],
+  HND: ['HND', 'NRT'],
+  DXB: ['DXB', 'DWC'],
+}
+
 export async function searchSerpApiFlightOptions(preferences: TripPreferences): Promise<FlightOption[]> {
   const apiKey = process.env.SERPAPI_API_KEY
   if (!apiKey) {
     throw new Error('SERPAPI_API_KEY is missing. Add it to .env.local')
   }
 
-  const params = buildSerpApiParams(preferences, apiKey)
-  const response = await fetch(`${SERPAPI_BASE_URL}?${params.toString()}`)
-  const payload = (await response.json()) as SerpApiResponse
+  const departurePrimary = toIataCode(preferences.origin)
+  const arrivalPrimary = toIataCode(preferences.destination)
+  const queryPlans = buildQueryPlans(departurePrimary, arrivalPrimary)
 
-  if (!response.ok) {
-    throw new Error(payload.error || `SerpApi request failed with status ${response.status}`)
+  let sawNoResults = false
+
+  for (const plan of queryPlans) {
+    const payload = await requestSerpApiOffers(preferences, apiKey, plan.departureId, plan.arrivalId)
+
+    if (payload.error) {
+      if (isNoResultsError(payload.error)) {
+        sawNoResults = true
+        continue
+      }
+      throw new Error(payload.error)
+    }
+
+    const offers = [...(payload.best_flights || []), ...(payload.other_flights || [])]
+    if (offers.length === 0) {
+      continue
+    }
+
+    return offers
+      .map((offer, index) => mapOfferToFlightOption(offer, preferences, `${plan.departureId}-${plan.arrivalId}-${index}`))
+      .filter((option): option is FlightOption => Boolean(option))
   }
 
-  if (payload.error) {
-    throw new Error(payload.error)
+  if (sawNoResults) {
+    return []
   }
 
-  const offers = [...(payload.best_flights || []), ...(payload.other_flights || [])]
-  return offers
-    .map((offer, index) => mapOfferToFlightOption(offer, preferences, index))
-    .filter((option): option is FlightOption => Boolean(option))
+  return []
 }
 
-function buildSerpApiParams(preferences: TripPreferences, apiKey: string): URLSearchParams {
+function requestSerpApiOffers(
+  preferences: TripPreferences,
+  apiKey: string,
+  departureId: string,
+  arrivalId: string
+): Promise<SerpApiResponse> {
+  const params = buildSerpApiParams(preferences, apiKey, departureId, arrivalId)
+  return fetch(`${SERPAPI_BASE_URL}?${params.toString()}`).then(async response => {
+    const payload = (await response.json()) as SerpApiResponse
+    if (!response.ok) {
+      throw new Error(payload.error || `SerpApi request failed with status ${response.status}`)
+    }
+    return payload
+  })
+}
+
+function buildSerpApiParams(
+  preferences: TripPreferences,
+  apiKey: string,
+  departureId: string,
+  arrivalId: string
+): URLSearchParams {
   const params = new URLSearchParams({
     engine: 'google_flights',
-    departure_id: toIataCode(preferences.origin),
-    arrival_id: toIataCode(preferences.destination),
+    departure_id: departureId,
+    arrival_id: arrivalId,
     outbound_date: preferences.departureDate,
     adults: String(Math.max(1, preferences.passengers.adults)),
     children: String(Math.max(0, preferences.passengers.children)),
@@ -123,13 +175,13 @@ function buildSerpApiParams(preferences: TripPreferences, apiKey: string): URLSe
 function mapOfferToFlightOption(
   offer: SerpFlightOffer,
   preferences: TripPreferences,
-  index: number
+  idSuffix: string
 ): FlightOption | null {
   const flights = offer.flights || []
   if (flights.length === 0) return null
 
   const segments: FlightSegment[] = flights.map((segment, segmentIndex) => ({
-    id: `SERP-${index}-SEG-${segmentIndex}`,
+    id: `SERP-${idSuffix}-SEG-${segmentIndex}`,
     airline: segment.airline || 'Unknown Airline',
     flightNumber: segment.flight_number || `FL-${segmentIndex + 1}`,
     departureAirport: segment.departure_airport?.id || 'N/A',
@@ -151,12 +203,12 @@ function mapOfferToFlightOption(
   )
 
   const totalCost = buildTotalCostEstimateFromOffer(offer, preferences)
-  const checkedBagIncluded = totalCost.lineItems.some(
-    item => item.id === 'checked-bag' && item.status === 'included'
-  )
+  const checkedBagLine = totalCost.lineItems.find(item => item.id === 'checked-bag')
+  const checkedBagAvailable = checkedBagLine ? checkedBagLine.status !== 'unknown' : false
+  const amenities = extractAmenitiesFromExtensions(offer.extensions || [])
 
   return {
-    id: `SERP-OFFER-${index}`,
+    id: `SERP-OFFER-${idSuffix}`,
     segments,
     price: {
       amount: totalCost.estimatedTotal,
@@ -168,9 +220,9 @@ function mapOfferToFlightOption(
     layoverDurations,
     baggage: {
       carryOn: 1,
-      checked: checkedBagIncluded ? 1 : 0,
+      checked: checkedBagAvailable ? 1 : 0,
     },
-    amenities: [],
+    amenities,
     cancellationPolicy: 'strict',
   }
 }
@@ -181,9 +233,12 @@ function buildTotalCostEstimateFromOffer(
 ): TotalCostEstimate {
   const currency = preferences.currency || 'USD'
   const headlineFare = Math.max(0, offer.price || 0)
-  const includesCheckedBag = (offer.extensions || []).some(item =>
+  const extensions = offer.extensions || []
+  const includesCheckedBag = extensions.some(item =>
     /checked bag included|includes checked bag|1 checked bag/i.test(item)
   )
+  const checkedBagCost = extractDollarAmount(extensions, /checked bag|baggage/i)
+  const seatSelectionCost = extractDollarAmount(extensions, /seat/i)
 
   const lineItems: CostLineItem[] = [
     {
@@ -197,10 +252,11 @@ function buildTotalCostEstimateFromOffer(
     {
       id: 'taxes-fees',
       label: 'Taxes & fees',
-      status: 'unknown',
+      status: 'included',
       required: true,
+      amount: 0,
       currency,
-      description: 'Google Flights summary does not always split tax/fee lines.',
+      description: 'Included in quoted fare from Google Flights data.',
     },
   ]
 
@@ -208,21 +264,24 @@ function buildTotalCostEstimateFromOffer(
     lineItems.push({
       id: 'checked-bag',
       label: 'Checked bag',
-      status: includesCheckedBag ? 'included' : 'unknown',
+      status: includesCheckedBag ? 'included' : typeof checkedBagCost === 'number' ? 'extra' : 'unknown',
       required: true,
-      amount: includesCheckedBag ? 0 : undefined,
+      amount: includesCheckedBag ? 0 : checkedBagCost,
       currency,
-      description: includesCheckedBag
-        ? 'Checked bag appears included for this offer.'
-        : 'Checked bag pricing not explicitly returned by SerpApi.',
+      description:
+        includesCheckedBag
+          ? 'Checked bag appears included for this offer.'
+          : typeof checkedBagCost === 'number'
+            ? 'Estimated from provider fare notes.'
+            : 'Checked bag pricing not explicitly returned by SerpApi.',
     })
   } else {
     lineItems.push({
       id: 'checked-bag',
       label: 'Checked bag (optional)',
-      status: includesCheckedBag ? 'included' : 'unknown',
+      status: includesCheckedBag ? 'included' : typeof checkedBagCost === 'number' ? 'extra' : 'unknown',
       required: false,
-      amount: includesCheckedBag ? 0 : undefined,
+      amount: includesCheckedBag ? 0 : checkedBagCost,
       currency,
     })
   }
@@ -230,18 +289,39 @@ function buildTotalCostEstimateFromOffer(
   lineItems.push({
     id: 'seat-selection',
     label: 'Seat selection (optional)',
-    status: 'unknown',
+    status: typeof seatSelectionCost === 'number' ? 'extra' : 'unknown',
     required: false,
+    amount: seatSelectionCost,
     currency,
   })
 
-  const confidence: TotalCostEstimate['confidence'] = 'low'
+  const requiredUnknownCount = lineItems.filter(item => item.required && item.status === 'unknown').length
+  const optionalUnknownCount = lineItems.filter(item => !item.required && item.status === 'unknown').length
+
+  const requiredKnownExtraTotal = lineItems.reduce((sum, item) => {
+    if (item.required && item.status === 'extra') {
+      return sum + (item.amount || 0)
+    }
+    return sum
+  }, 0)
+
+  const optionalKnownExtraTotal = lineItems.reduce((sum, item) => {
+    if (!item.required && item.status === 'extra') {
+      return sum + (item.amount || 0)
+    }
+    return sum
+  }, 0)
+
+  const optionalUnknownEstimate = optionalUnknownCount * DEFAULT_OPTIONAL_UNKNOWN_ESTIMATE
+
+  const confidence: TotalCostEstimate['confidence'] =
+    requiredUnknownCount > 0 ? 'low' : optionalUnknownCount > 0 ? 'medium' : 'high'
 
   return {
     currency,
     headlineFare,
-    estimatedTotal: headlineFare,
-    potentialTotal: headlineFare,
+    estimatedTotal: headlineFare + requiredKnownExtraTotal,
+    potentialTotal: headlineFare + requiredKnownExtraTotal + optionalKnownExtraTotal + optionalUnknownEstimate,
     confidence,
     lineItems,
   }
@@ -289,4 +369,59 @@ function toIataCode(input: string): string {
 
 function normalizeSerpAirportId(code: string): string {
   return SERP_METRO_FALLBACKS[code] || code
+}
+
+function buildQueryPlans(departureCode: string, arrivalCode: string): Array<{ departureId: string; arrivalId: string }> {
+  const departureCandidates = getAirportCandidates(departureCode)
+  const arrivalCandidates = getAirportCandidates(arrivalCode)
+
+  const plans: Array<{ departureId: string; arrivalId: string }> = []
+  plans.push({ departureId: departureCandidates[0], arrivalId: arrivalCandidates[0] })
+
+  for (const dep of departureCandidates.slice(1, 3)) {
+    plans.push({ departureId: dep, arrivalId: arrivalCandidates[0] })
+  }
+  for (const arr of arrivalCandidates.slice(1, 3)) {
+    plans.push({ departureId: departureCandidates[0], arrivalId: arr })
+  }
+
+  return plans
+}
+
+function getAirportCandidates(code: string): string[] {
+  return AIRPORT_CANDIDATE_GROUPS[code] || [code]
+}
+
+function isNoResultsError(error: string): boolean {
+  return /hasn'?t returned any results|no results/i.test(error)
+}
+
+function extractDollarAmount(extensions: string[], clueRegex: RegExp): number | undefined {
+  for (const extension of extensions) {
+    if (!clueRegex.test(extension)) continue
+    const match = extension.match(/\$(\d+(?:\.\d+)?)/)
+    if (match) {
+      const parsed = Number(match[1])
+      if (!Number.isNaN(parsed)) return Math.round(parsed)
+    }
+  }
+  return undefined
+}
+
+function extractAmenitiesFromExtensions(extensions: string[]): string[] {
+  const amenities: string[] = []
+  const add = (label: string) => {
+    if (!amenities.includes(label)) amenities.push(label)
+  }
+
+  for (const extension of extensions) {
+    const lower = extension.toLowerCase()
+    if (lower.includes('wifi') || lower.includes('wi-fi')) add('WiFi')
+    if (lower.includes('legroom')) add('Extra Legroom')
+    if (lower.includes('meal')) add('Meals')
+    if (lower.includes('carry-on') || lower.includes('carry on')) add('Carry-on Included')
+    if (lower.includes('checked bag included')) add('Checked Bag Included')
+  }
+
+  return amenities
 }
