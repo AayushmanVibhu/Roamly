@@ -275,7 +275,7 @@ export async function deleteWatch(watchId: string): Promise<boolean> {
   const db = await getWatchDb()
   if (db) {
     const result = await db.query(`DELETE FROM ${WATCH_TABLE} WHERE id = $1`, [watchId])
-    return result.rowCount > 0
+    return (result.rowCount || 0) > 0
   }
 
   const store = await readFileStore()
