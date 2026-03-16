@@ -15,6 +15,9 @@ export default function ResultsPage() {
   const [isLoading, setIsLoading] = useState(true)
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [dataSource, setDataSource] = useState<string>('unknown')
+  const [watchEmail, setWatchEmail] = useState('')
+  const [watchStatusMessage, setWatchStatusMessage] = useState<string | null>(null)
+  const [isCreatingWatch, setIsCreatingWatch] = useState(false)
 
   useEffect(() => {
     let isMounted = true
@@ -93,6 +96,46 @@ export default function ResultsPage() {
         return sorted.sort((a, b) => a.flight.totalDuration - b.flight.totalDuration)
       default:
         return sorted
+    }
+  }
+
+  const handleCreateWatch = async () => {
+    if (!preferences) return
+
+    if (!watchEmail.trim()) {
+      setWatchStatusMessage('Enter your email to create a price watch.')
+      return
+    }
+
+    setIsCreatingWatch(true)
+    setWatchStatusMessage(null)
+
+    try {
+      const response = await fetch('/api/watches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: watchEmail.trim(),
+          preferences,
+          targetPrice: preferences.maxBudget,
+          checkIntervalMinutes: 60,
+        }),
+      })
+
+      const payload = await response.json()
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Failed to create watch.')
+      }
+
+      setWatchStatusMessage(
+        `Watch created. We'll check every ${payload.watch?.checkIntervalMinutes || 60} minutes and alert ${watchEmail.trim()}.`
+      )
+    } catch (error) {
+      setWatchStatusMessage(error instanceof Error ? error.message : 'Failed to create watch.')
+    } finally {
+      setIsCreatingWatch(false)
     }
   }
 
@@ -188,6 +231,32 @@ export default function ResultsPage() {
         </div>
 
         {/* Controls */}
+        <div className="mb-6 bg-dark-800 border border-dark-700 rounded-xl p-4">
+          <h3 className="text-dark-50 font-semibold mb-2">Track this trip automatically</h3>
+          <p className="text-sm text-dark-300 mb-3">
+            If this option is not available now, Roamly can keep checking and alert you when a matching deal appears.
+          </p>
+          <div className="flex flex-col md:flex-row gap-3">
+            <input
+              type="email"
+              value={watchEmail}
+              onChange={e => setWatchEmail(e.target.value)}
+              placeholder="Enter email for alerts"
+              className="flex-1 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
+            />
+            <button
+              onClick={handleCreateWatch}
+              disabled={isCreatingWatch}
+              className="px-4 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
+            >
+              {isCreatingWatch ? 'Creating Watch...' : 'Create Watch'}
+            </button>
+          </div>
+          {watchStatusMessage && (
+            <div className="mt-3 text-sm text-primary-300">{watchStatusMessage}</div>
+          )}
+        </div>
+
         <div className="flex flex-col md:flex-row gap-4 mb-8 bg-dark-800 border border-dark-700 rounded-xl p-4 shadow-sm">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-dark-300" />

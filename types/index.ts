@@ -165,6 +165,30 @@ export interface TravelRecommendation {
   alternativeOptions?: string[]
 }
 
+export type TravelWatchStatus = 'active' | 'paused' | 'matched' | 'cancelled'
+
+export interface WatchMatchSnapshot {
+  recommendationId: string
+  estimatedTotal: number
+  currency: string
+  matchedAt: string
+  summary: string
+}
+
+export interface TravelWatch {
+  id: string
+  email: string
+  preferences: TripPreferences
+  targetPrice: number
+  checkIntervalMinutes: number
+  status: TravelWatchStatus
+  createdAt: string
+  updatedAt: string
+  lastCheckedAt?: string
+  lastNotifiedAt?: string
+  latestMatch?: WatchMatchSnapshot
+}
+
 // User saved trip
 export interface SavedTrip {
   id: string

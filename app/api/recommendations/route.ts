@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { rankAndExplainRecommendations } from '@/lib/recommendationEngine'
-import { searchSerpApiFlightOptions } from '@/lib/serpApiClient'
+import { getLiveRecommendations } from '@/lib/liveRecommendations'
 import { TripPreferences } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -39,8 +38,7 @@ export async function POST(request: NextRequest) {
     }
     
     // Fetch live offers from SerpApi (Google Flights) and rank using Roamly scoring
-    const liveFlightOptions = await searchSerpApiFlightOptions(preferences)
-    const recommendations = rankAndExplainRecommendations(liveFlightOptions, preferences)
+    const { source, recommendations } = await getLiveRecommendations(preferences)
     
     // Return recommendations
     return NextResponse.json({
@@ -53,7 +51,7 @@ export async function POST(request: NextRequest) {
         returnDate: preferences.returnDate
       },
       recommendations,
-      source: 'serpapi',
+      source,
       message:
         recommendations.length === 0
           ? 'Option is not available for the selected constraints right now.'
