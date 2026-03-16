@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { generateRecommendations } from '@/lib/recommendationEngine'
+import { rankAndExplainRecommendations } from '@/lib/recommendationEngine'
+import { searchDuffelFlightOptions } from '@/lib/duffelClient'
 import { TripPreferences } from '@/types'
+
+export const dynamic = 'force-dynamic'
 
 /**
  * API Route: POST /api/recommendations
@@ -35,8 +38,9 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Generate recommendations
-    const recommendations = generateRecommendations(preferences)
+    // Fetch live offers from Duffel and rank them using Roamly scoring
+    const liveFlightOptions = await searchDuffelFlightOptions(preferences)
+    const recommendations = rankAndExplainRecommendations(liveFlightOptions, preferences)
     
     // Return recommendations
     return NextResponse.json({
@@ -48,13 +52,16 @@ export async function POST(request: NextRequest) {
         departureDate: preferences.departureDate,
         returnDate: preferences.returnDate
       },
-      recommendations
+      recommendations,
+      source: 'duffel'
     })
     
   } catch (error) {
     console.error('Error generating recommendations:', error)
     return NextResponse.json(
-      { error: 'Internal server error' },
+      {
+        error: error instanceof Error ? error.message : 'Internal server error',
+      },
       { status: 500 }
     )
   }
@@ -68,6 +75,7 @@ export async function GET() {
   return NextResponse.json({
     status: 'healthy',
     service: 'Roamly Recommendation Engine',
+    provider: 'Duffel',
     timestamp: new Date().toISOString()
   })
 }

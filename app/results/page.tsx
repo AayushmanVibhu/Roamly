@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Plane, ArrowLeft, Filter, Sparkles } from 'lucide-react'
 import { TripPreferences, TravelRecommendation } from '@/types'
-import { generateRecommendations } from '@/lib/recommendationEngine'
 import RecommendationCard from '@/components/RecommendationCard'
 
 export default function ResultsPage() {
@@ -14,29 +13,63 @@ export default function ResultsPage() {
   const [recommendations, setRecommendations] = useState<TravelRecommendation[]>([])
   const [sortBy, setSortBy] = useState<'score' | 'price' | 'duration'>('score')
   const [isLoading, setIsLoading] = useState(true)
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   useEffect(() => {
+    let isMounted = true
+
+    const loadRecommendations = async (prefs: TripPreferences) => {
+      try {
+        const response = await fetch('/api/recommendations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(prefs),
+        })
+
+        const payload = await response.json()
+
+        if (!response.ok) {
+          throw new Error(payload?.error || 'Failed to fetch live recommendations')
+        }
+
+        if (!isMounted) return
+
+        setRecommendations(payload.recommendations || [])
+        if ((payload.recommendations || []).length === 0) {
+          setErrorMessage('No live offers matched this search right now. Try flexible dates or a higher budget.')
+        }
+      } catch (error) {
+        console.error('Error generating recommendations:', error)
+        if (!isMounted) return
+        setErrorMessage(
+          error instanceof Error
+            ? error.message
+            : 'Could not fetch live offers. Please try again in a moment.'
+        )
+        setRecommendations([])
+      } finally {
+        if (isMounted) setIsLoading(false)
+      }
+    }
+
     // Load preferences from session storage
     const stored = sessionStorage.getItem('tripPreferences')
     if (stored) {
       const prefs = JSON.parse(stored)
-      setPreferences(prefs)
-      
-      // Generate recommendations using the recommendation engine
-      try {
-        const results = generateRecommendations(prefs)
-        setRecommendations(results)
-      } catch (error) {
-        console.error('Error generating recommendations:', error)
-      } finally {
-        setIsLoading(false)
-      }
+      if (isMounted) setPreferences(prefs)
+      void loadRecommendations(prefs)
     } else {
       // No preferences found, redirect to assistant page
-      setIsLoading(false)
+      if (isMounted) setIsLoading(false)
       setTimeout(() => {
         router.push('/assistant')
       }, 2000)
+    }
+
+    return () => {
+      isMounted = false
     }
   }, [router])
 
@@ -187,6 +220,12 @@ export default function ResultsPage() {
         </div>
 
         {/* Recommendations */}
+        {errorMessage && (
+          <div className="mb-6 bg-yellow-900/20 border border-yellow-700/30 text-yellow-200 rounded-lg p-4">
+            {errorMessage}
+          </div>
+        )}
+
         <div className="space-y-6">
           {sortedRecommendations.map((recommendation, index) => (
             <RecommendationCard

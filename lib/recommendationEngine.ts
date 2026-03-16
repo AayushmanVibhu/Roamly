@@ -46,6 +46,16 @@ const AIRLINES_WITH_INCLUDED_CHECKED_BAG = new Set(['Southwest'])
 export function generateRecommendations(preferences: TripPreferences): TravelRecommendation[] {
   // Step 1: Generate flight options
   const flightOptions = generateFlightOptions(preferences)
+  return rankAndExplainRecommendations(flightOptions, preferences)
+}
+
+/**
+ * Rank and explain externally provided flight options (e.g. Duffel API).
+ */
+export function rankAndExplainRecommendations(
+  flightOptions: FlightOption[],
+  preferences: TripPreferences
+): TravelRecommendation[] {
   
   // Step 2: Score each option
   const recommendations: TravelRecommendation[] = flightOptions.map(flight => {
