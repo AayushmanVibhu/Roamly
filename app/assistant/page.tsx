@@ -182,11 +182,19 @@ export default function AIAssistantPage() {
   ])
   const [constraints, setConstraints] = useState<TravelConstraints>({})
   const [isGenerating, setIsGenerating] = useState(false)
+  const [watchEmail, setWatchEmail] = useState('')
+  const [watchStatusMessage, setWatchStatusMessage] = useState<string | null>(null)
+  const [isCreatingWatch, setIsCreatingWatch] = useState(false)
   const constraintsRef = useRef<TravelConstraints>({})
 
   useEffect(() => {
     constraintsRef.current = constraints
   }, [constraints])
+
+  useEffect(() => {
+    const saved = localStorage.getItem('watchEmail')
+    if (saved) setWatchEmail(saved)
+  }, [])
 
   const handleSendMessage = (content: string) => {
     // Add user message
@@ -314,6 +322,57 @@ export default function AIAssistantPage() {
     }, 1500)
   }
 
+  const handleCreateWatch = async () => {
+    if (!watchEmail.trim()) {
+      setWatchStatusMessage('Please enter an email to create a watch.')
+      return
+    }
+
+    const validation = validateConstraints(constraintsRef.current)
+    if (!validation.isValid) {
+      setWatchStatusMessage(`To create a watch, add: ${validation.missingFields.join(', ')}`)
+      return
+    }
+
+    const preferences = convertConstraintsToPreferences(constraintsRef.current)
+    if (!preferences) {
+      setWatchStatusMessage('Could not convert chat constraints to watch preferences.')
+      return
+    }
+
+    setIsCreatingWatch(true)
+    setWatchStatusMessage(null)
+
+    try {
+      const response = await fetch('/api/watches', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: watchEmail.trim(),
+          preferences,
+          targetPrice: constraintsRef.current.budget || preferences.maxBudget,
+          checkIntervalMinutes: 60,
+        }),
+      })
+
+      const payload = await response.json()
+      if (!response.ok) {
+        throw new Error(payload?.error || 'Failed to create watch.')
+      }
+
+      localStorage.setItem('watchEmail', watchEmail.trim().toLowerCase())
+      setWatchStatusMessage(
+        `Watch created. We'll notify ${watchEmail.trim()} when a matching deal appears.`
+      )
+    } catch (error) {
+      setWatchStatusMessage(error instanceof Error ? error.message : 'Failed to create watch.')
+    } finally {
+      setIsCreatingWatch(false)
+    }
+  }
+
   return (
     <div className="min-h-screen bg-dark-950 flex flex-col">
       {/* Header */}
@@ -379,6 +438,11 @@ export default function AIAssistantPage() {
             constraints={constraints}
             onGenerateRecommendations={handleGenerateRecommendations}
             isGenerating={isGenerating}
+            watchEmail={watchEmail}
+            onWatchEmailChange={setWatchEmail}
+            onCreateWatch={handleCreateWatch}
+            isCreatingWatch={isCreatingWatch}
+            watchStatusMessage={watchStatusMessage}
           />
         </div>
       </div>
@@ -395,6 +459,11 @@ export default function AIAssistantPage() {
           constraints={constraints}
           onGenerateRecommendations={handleGenerateRecommendations}
           isGenerating={isGenerating}
+          watchEmail={watchEmail}
+          onWatchEmailChange={setWatchEmail}
+          onCreateWatch={handleCreateWatch}
+          isCreatingWatch={isCreatingWatch}
+          watchStatusMessage={watchStatusMessage}
         />
       </div>
     </div>

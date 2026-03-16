@@ -1,16 +1,26 @@
 import { TravelConstraints } from '@/types'
-import { Sparkles, ArrowRight, AlertCircle } from 'lucide-react'
+import { Sparkles, ArrowRight, AlertCircle, BellRing } from 'lucide-react'
 
 interface RecommendationTriggerProps {
   constraints: TravelConstraints
   onGenerateRecommendations: () => void
   isGenerating?: boolean
+  watchEmail?: string
+  onWatchEmailChange?: (value: string) => void
+  onCreateWatch?: () => void
+  isCreatingWatch?: boolean
+  watchStatusMessage?: string | null
 }
 
 export default function RecommendationTrigger({
   constraints,
   onGenerateRecommendations,
   isGenerating = false,
+  watchEmail,
+  onWatchEmailChange,
+  onCreateWatch,
+  isCreatingWatch = false,
+  watchStatusMessage = null,
 }: RecommendationTriggerProps) {
   const hasOrigin = !!constraints.origin
   const hasDestination = !!constraints.destination
@@ -63,6 +73,38 @@ export default function RecommendationTrigger({
         <p className="text-xs text-center text-dark-400 mt-3">
           Ready to search! Click to find the best flights matching your preferences
         </p>
+      )}
+
+      {onCreateWatch && onWatchEmailChange && (
+        <div className="mt-4 bg-dark-800 border border-dark-700 rounded-lg p-3">
+          <div className="flex items-center gap-2 mb-2 text-sm text-dark-200">
+            <BellRing className="w-4 h-4 text-primary-400" />
+            <span>Or create a watch from chat</span>
+          </div>
+          <div className="flex gap-2">
+            <input
+              type="email"
+              value={watchEmail || ''}
+              onChange={(e) => onWatchEmailChange(e.target.value)}
+              placeholder="Email for deal alerts"
+              className="flex-1 px-3 py-2 rounded-md bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500 text-sm"
+            />
+            <button
+              onClick={onCreateWatch}
+              disabled={!hasMinimumInfo || isCreatingWatch}
+              className={`px-3 py-2 rounded-md text-sm font-medium ${
+                !hasMinimumInfo || isCreatingWatch
+                  ? 'bg-dark-700 text-dark-500 cursor-not-allowed'
+                  : 'bg-primary-600 hover:bg-primary-700 text-white'
+              }`}
+            >
+              {isCreatingWatch ? 'Saving...' : 'Create Watch'}
+            </button>
+          </div>
+          {watchStatusMessage && (
+            <p className="text-xs text-primary-300 mt-2">{watchStatusMessage}</p>
+          )}
+        </div>
       )}
     </div>
   )
