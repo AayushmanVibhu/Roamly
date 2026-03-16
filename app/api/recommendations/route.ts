@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { rankAndExplainRecommendations } from '@/lib/recommendationEngine'
 import { searchDuffelFlightOptions } from '@/lib/duffelClient'
+import { searchSerpApiFlightOptions } from '@/lib/serpApiClient'
 import { TripPreferences } from '@/types'
 
 export const dynamic = 'force-dynamic'
@@ -38,8 +39,13 @@ export async function POST(request: NextRequest) {
       )
     }
     
-    // Fetch live offers from Duffel and rank them using Roamly scoring
-    const liveFlightOptions = await searchDuffelFlightOptions(preferences)
+    const provider = resolveFlightProvider()
+
+    // Fetch live offers from selected provider and rank using Roamly scoring
+    const liveFlightOptions =
+      provider === 'serpapi'
+        ? await searchSerpApiFlightOptions(preferences)
+        : await searchDuffelFlightOptions(preferences)
     const recommendations = rankAndExplainRecommendations(liveFlightOptions, preferences)
     
     // Return recommendations
@@ -53,7 +59,7 @@ export async function POST(request: NextRequest) {
         returnDate: preferences.returnDate
       },
       recommendations,
-      source: 'duffel'
+      source: provider
     })
     
   } catch (error) {
@@ -72,10 +78,21 @@ export async function POST(request: NextRequest) {
  * Health check endpoint
  */
 export async function GET() {
+  const provider = resolveFlightProvider()
   return NextResponse.json({
     status: 'healthy',
     service: 'Roamly Recommendation Engine',
-    provider: 'Duffel',
+    provider,
     timestamp: new Date().toISOString()
   })
+}
+
+function resolveFlightProvider(): 'duffel' | 'serpapi' {
+  const configuredProvider = (process.env.FLIGHT_PROVIDER || 'auto').toLowerCase()
+
+  if (configuredProvider === 'duffel') return 'duffel'
+  if (configuredProvider === 'serpapi') return 'serpapi'
+
+  if (process.env.SERPAPI_API_KEY) return 'serpapi'
+  return 'duffel'
 }
