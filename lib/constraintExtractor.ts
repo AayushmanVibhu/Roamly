@@ -120,6 +120,18 @@ const MONTH_NAMES = [
   'july', 'august', 'september', 'october', 'november', 'december'
 ]
 
+const WORD_NUMBERS: Record<string, number> = {
+  one: 1,
+  two: 2,
+  three: 3,
+  four: 4,
+  five: 5,
+  six: 6,
+  seven: 7,
+  eight: 8,
+  nine: 9,
+}
+
 /**
  * Normalize user message for consistent parsing
  * - Convert to lowercase
@@ -128,6 +140,7 @@ const MONTH_NAMES = [
  */
 function normalizeMessage(text: string): string {
   let normalized = text.toLowerCase()
+  normalized = normalized.replace(/->|→/g, ' to ')
   
   // Remove common filler phrases
   const fillers = [
@@ -177,8 +190,48 @@ function extractRoute(text: string): { origin?: string; destination?: string } {
     result.origin = matchAirport(originText)
     result.destination = matchAirport(destinationText)
   }
+
+  // Pattern: "to <destination> from <origin>"
+  const reverseRouteMatch = normalized.match(/\bto\s+([a-zA-Z\s]+?)\s+from\s+([a-zA-Z\s]+?)(?:\s+on|\s+in|\s+under|\s+with|\s+for|\s+next|\s+this|$)/i)
+  if (!result.origin && !result.destination && reverseRouteMatch) {
+    const destinationText = reverseRouteMatch[1].trim()
+    const originText = reverseRouteMatch[2].trim()
+    result.origin = matchAirport(originText)
+    result.destination = matchAirport(destinationText)
+  }
+
+  // Fallback: infer first two airport/city mentions from sentence
+  if (!result.origin || !result.destination) {
+    const mentions = extractAirportMentions(normalized)
+    if (!result.origin && mentions[0]) result.origin = mentions[0]
+    if (!result.destination && mentions[1]) result.destination = mentions[1]
+  }
   
   return result
+}
+
+function extractAirportMentions(normalized: string): string[] {
+  const mentions: Array<{ index: number; value: string }> = []
+  const sortedKeys = Object.keys(AIRPORTS).sort((a, b) => b.length - a.length)
+
+  for (const key of sortedKeys) {
+    const value = AIRPORTS[key]
+    const regex = new RegExp(`\\b${escapeRegex(key)}\\b`, 'gi')
+    let match: RegExpExecArray | null
+    while ((match = regex.exec(normalized)) !== null) {
+      mentions.push({ index: match.index, value })
+    }
+  }
+
+  mentions.sort((a, b) => a.index - b.index)
+  const unique: string[] = []
+  for (const mention of mentions) {
+    if (!unique.includes(mention.value)) {
+      unique.push(mention.value)
+    }
+    if (unique.length >= 2) break
+  }
+  return unique
 }
 
 /**
@@ -300,8 +353,36 @@ function extractRelativeDate(normalized: string): string | undefined {
     const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1)
     return formatDate(nextMonth)
   }
+
+  const nextNamedMonthMatch = normalized.match(/\bnext\s+(january|february|march|april|may|june|july|august|september|october|november|december)\b/i)
+  if (nextNamedMonthMatch) {
+    return buildMonthStartDate(nextNamedMonthMatch[1], true)
+  }
+
+  const inNamedMonthMatch = normalized.match(/\bin\s+(january|february|march|april|may|june|july|august|september|october|november|december)\b/i)
+  if (inNamedMonthMatch) {
+    return buildMonthStartDate(inNamedMonthMatch[1], false)
+  }
   
   return undefined
+}
+
+function buildMonthStartDate(monthName: string, isNextMonthPhrase: boolean): string | undefined {
+  const monthIndex = MONTH_NAMES.indexOf(monthName.toLowerCase())
+  if (monthIndex === -1) return undefined
+
+  const now = new Date()
+  const currentYear = now.getFullYear()
+  const currentMonth = now.getMonth()
+
+  let year = currentYear
+  if (isNextMonthPhrase) {
+    if (monthIndex <= currentMonth) year = currentYear + 1
+  } else if (monthIndex < currentMonth) {
+    year = currentYear + 1
+  }
+
+  return `${year}-${String(monthIndex + 1).padStart(2, '0')}-01`
 }
 
 /**
@@ -389,12 +470,46 @@ function extractPassengers(text: string): number | undefined {
     }
   }
 
+  const wordMatch = normalized.match(/\b(one|two|three|four|five|six|seven|eight|nine)\s+(?:passenger|person|people|traveler|adult)s?\b/i)
+  if (wordMatch) {
+    return WORD_NUMBERS[wordMatch[1].toLowerCase()]
+  }
+
   // Solo travel indicators
   if (/\b(?:solo|alone)\b/i.test(normalized)) {
     return 1
   }
 
   return undefined
+}
+
+function extractTripDurationDays(text: string): number | undefined {
+  const normalized = normalizeMessage(text)
+
+  const numericDuration = normalized.match(/\bfor\s+(\d+)\s*(day|days|night|nights|week|weeks)\b/i)
+  if (numericDuration) {
+    const value = parseInt(numericDuration[1], 10)
+    const unit = numericDuration[2].toLowerCase()
+    if (unit.startsWith('week')) return value * 7
+    return value
+  }
+
+  const wordDuration = normalized.match(/\bfor\s+(one|two|three|four|five|six|seven|eight|nine)\s+(day|days|night|nights|week|weeks)\b/i)
+  if (wordDuration) {
+    const value = WORD_NUMBERS[wordDuration[1].toLowerCase()]
+    const unit = wordDuration[2].toLowerCase()
+    if (unit.startsWith('week')) return value * 7
+    return value
+  }
+
+  if (/\bfor\s+(a|one)\s+week\b/i.test(normalized)) return 7
+  return undefined
+}
+
+function addDaysToIsoDate(dateIso: string, days: number): string {
+  const base = new Date(`${dateIso}T00:00:00`)
+  base.setDate(base.getDate() + days)
+  return formatDate(base)
 }
 
 /**
@@ -519,6 +634,10 @@ function toTitleCase(str: string): string {
   return str.replace(/\w\S*/g, (txt) => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase())
 }
 
+function escapeRegex(input: string): string {
+  return input.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
 /**
  * Main extraction function - parses user message and extracts all constraints
  * Uses modular approach for maintainability
@@ -542,6 +661,12 @@ export function extractConstraints(text: string): Partial<TravelConstraints> {
   // Extract trip type
   const tripType = extractTripType(text)
   if (tripType) constraints.tripType = tripType
+
+  // Infer return date from trip duration phrases (e.g. "for 5 days")
+  const durationDays = extractTripDurationDays(text)
+  if (durationDays && constraints.departureDate && constraints.tripType !== 'one-way') {
+    constraints.returnDate = addDaysToIsoDate(constraints.departureDate, durationDays)
+  }
 
   // Extract passengers
   const passengers = extractPassengers(text)

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { ChatMessage, TravelConstraints, QuickReply } from '@/types'
@@ -182,6 +182,11 @@ export default function AIAssistantPage() {
   ])
   const [constraints, setConstraints] = useState<TravelConstraints>({})
   const [isGenerating, setIsGenerating] = useState(false)
+  const constraintsRef = useRef<TravelConstraints>({})
+
+  useEffect(() => {
+    constraintsRef.current = constraints
+  }, [constraints])
 
   const handleSendMessage = (content: string) => {
     // Add user message
@@ -195,7 +200,7 @@ export default function AIAssistantPage() {
 
     // Generate AI response with extracted constraints
     setTimeout(() => {
-      const aiMessage = generateMockResponse(content, constraints)
+      const aiMessage = generateMockResponse(content, constraintsRef.current)
       setMessages((prev) => [...prev, aiMessage])
 
       // Update constraints if any were extracted
@@ -220,7 +225,7 @@ export default function AIAssistantPage() {
 
     // Add confirmation message
     setTimeout(() => {
-      const mergedConstraints = { ...constraints, [field]: value }
+      const mergedConstraints = { ...constraintsRef.current, [field]: value }
       const aiMessage = generateMockResponse('', mergedConstraints)
       setMessages((prev) => [...prev, aiMessage])
     }, 300)
@@ -251,7 +256,7 @@ export default function AIAssistantPage() {
 
     // Generate follow-up response
     setTimeout(() => {
-      const mergedConstraints = { ...constraints, [reply.field]: processedValue }
+      const mergedConstraints = { ...constraintsRef.current, [reply.field]: processedValue }
       const aiMessage = generateMockResponse('', mergedConstraints)
       setMessages((prev) => [...prev, aiMessage])
     }, 300)
@@ -338,6 +343,12 @@ export default function AIAssistantPage() {
                 className="text-dark-300 hover:text-dark-50 transition text-sm"
               >
                 Dashboard
+              </Link>
+              <Link
+                href="/watches"
+                className="text-dark-300 hover:text-dark-50 transition text-sm"
+              >
+                My Watches
               </Link>
             </div>
           </div>

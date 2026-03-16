@@ -31,6 +31,9 @@ export default function DashboardPage() {
               <Link href="/planner" className="text-dark-300 hover:text-dark-50 transition">
                 Plan Trip
               </Link>
+              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
+                My Watches
+              </Link>
               <Link href="/dashboard" className="text-primary-400 font-medium">
                 Dashboard
               </Link>

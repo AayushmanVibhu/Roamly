@@ -203,6 +203,12 @@ export default function ResultsPage() {
               >
                 Classic Form
               </Link>
+              <Link
+                href="/watches"
+                className="text-dark-300 hover:text-dark-50 transition text-sm"
+              >
+                My Watches
+              </Link>
             </div>
           </div>
         </div>

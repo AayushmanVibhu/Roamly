@@ -27,6 +27,9 @@ export default function Home() {
               <Link href="/dashboard" className="text-dark-300 hover:text-dark-50 transition">
                 Dashboard
               </Link>
+              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
+                My Watches
+              </Link>
               <Link
                 href="/planner"
                 className="bg-primary-600 text-white px-6 py-2 rounded-full hover:bg-primary-700 transition"
