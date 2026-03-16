@@ -40,7 +40,7 @@ interface SerpFlightSegment {
 }
 
 const AIRPORT_ALIASES: Record<string, string> = {
-  'new york': 'NYC',
+  'new york': 'JFK',
   'los angeles': 'LAX',
   'san francisco': 'SFO',
   'chicago': 'ORD',
@@ -60,6 +60,13 @@ const AIRPORT_ALIASES: Record<string, string> = {
   'paris': 'CDG',
   'tokyo': 'NRT',
   'dubai': 'DXB',
+}
+
+const SERP_METRO_FALLBACKS: Record<string, string> = {
+  NYC: 'JFK',
+  LON: 'LHR',
+  CHI: 'ORD',
+  WAS: 'IAD',
 }
 
 export async function searchSerpApiFlightOptions(preferences: TripPreferences): Promise<FlightOption[]> {
@@ -268,14 +275,18 @@ function toIsoDateTime(value?: string): string {
 function toIataCode(input: string): string {
   const text = input.trim()
   const parenMatch = text.toUpperCase().match(/\(([A-Z]{3})\)/)
-  if (parenMatch) return parenMatch[1]
+  if (parenMatch) return normalizeSerpAirportId(parenMatch[1])
 
   const directCode = text.toUpperCase().match(/\b[A-Z]{3}\b/)
-  if (directCode) return directCode[0]
+  if (directCode) return normalizeSerpAirportId(directCode[0])
 
   const mapped = AIRPORT_ALIASES[text.toLowerCase()]
-  if (mapped) return mapped
+  if (mapped) return normalizeSerpAirportId(mapped)
 
   const lettersOnly = text.replace(/[^a-zA-Z]/g, '').toUpperCase()
-  return lettersOnly.slice(0, 3)
+  return normalizeSerpAirportId(lettersOnly.slice(0, 3))
+}
+
+function normalizeSerpAirportId(code: string): string {
+  return SERP_METRO_FALLBACKS[code] || code
 }
