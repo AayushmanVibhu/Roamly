@@ -14,7 +14,8 @@ import {
   Award,
   Sparkles,
   CheckCircle2,
-  AlertTriangle
+  AlertTriangle,
+  ExternalLink
 } from 'lucide-react'
 import TravelScoreBadge from './TravelScoreBadge'
 import PriceBreakdown from './PriceBreakdown'
@@ -174,9 +175,24 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
               </div>
             </div>
 
-            <button className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition font-semibold mt-4">
-              Select Flight
-            </button>
+            {flight.bookingUrl ? (
+              <a
+                href={flight.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition font-semibold mt-4 inline-flex items-center justify-center gap-2"
+              >
+                Select Flight
+                <ExternalLink className="w-4 h-4" />
+              </a>
+            ) : (
+              <button
+                disabled
+                className="w-full bg-dark-700 text-dark-300 py-3 rounded-lg cursor-not-allowed font-semibold mt-4"
+              >
+                Booking Link Unavailable
+              </button>
+            )}
           </div>
         </div>
 

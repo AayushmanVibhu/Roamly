@@ -120,6 +120,7 @@ export interface FlightSegment {
 export interface FlightOption {
   id: string
   segments: FlightSegment[]
+  bookingUrl?: string
   price: {
     amount: number
     currency: string

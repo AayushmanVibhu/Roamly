@@ -9,6 +9,7 @@ interface SerpApiResponse {
   error?: string
   search_metadata?: {
     status?: string
+    google_flights_url?: string
   }
 }
 
@@ -22,6 +23,11 @@ interface SerpFlightOffer {
   total_duration?: number
   price?: number
   extensions?: string[]
+  booking_request?: {
+    url?: string
+  }
+  booking_url?: string
+  link?: string
 }
 
 interface SerpFlightSegment {
@@ -113,7 +119,16 @@ export async function searchSerpApiFlightOptions(preferences: TripPreferences): 
     }
 
     return offers
-      .map((offer, index) => mapOfferToFlightOption(offer, preferences, `${plan.departureId}-${plan.arrivalId}-${index}`))
+      .map((offer, index) =>
+        mapOfferToFlightOption(offer, preferences, {
+          idSuffix: `${plan.departureId}-${plan.arrivalId}-${index}`,
+          departureId: plan.departureId,
+          arrivalId: plan.arrivalId,
+          fallbackBookingUrl:
+            payload.search_metadata?.google_flights_url ||
+            buildGoogleFlightsSearchUrl(preferences, plan.departureId, plan.arrivalId),
+        })
+      )
       .filter((option): option is FlightOption => Boolean(option))
   }
 
@@ -175,13 +190,18 @@ function buildSerpApiParams(
 function mapOfferToFlightOption(
   offer: SerpFlightOffer,
   preferences: TripPreferences,
-  idSuffix: string
+  context: {
+    idSuffix: string
+    departureId: string
+    arrivalId: string
+    fallbackBookingUrl: string
+  }
 ): FlightOption | null {
   const flights = offer.flights || []
   if (flights.length === 0) return null
 
   const segments: FlightSegment[] = flights.map((segment, segmentIndex) => ({
-    id: `SERP-${idSuffix}-SEG-${segmentIndex}`,
+    id: `SERP-${context.idSuffix}-SEG-${segmentIndex}`,
     airline: segment.airline || 'Unknown Airline',
     flightNumber: segment.flight_number || `FL-${segmentIndex + 1}`,
     departureAirport: segment.departure_airport?.id || 'N/A',
@@ -206,10 +226,18 @@ function mapOfferToFlightOption(
   const checkedBagLine = totalCost.lineItems.find(item => item.id === 'checked-bag')
   const checkedBagAvailable = checkedBagLine ? checkedBagLine.status !== 'unknown' : false
   const amenities = extractAmenitiesFromExtensions(offer.extensions || [])
+  const bookingUrl = resolveOfferBookingUrl(
+    offer,
+    context.fallbackBookingUrl,
+    preferences,
+    context.departureId,
+    context.arrivalId
+  )
 
   return {
-    id: `SERP-OFFER-${idSuffix}`,
+    id: `SERP-OFFER-${context.idSuffix}`,
     segments,
+    bookingUrl,
     price: {
       amount: totalCost.estimatedTotal,
       currency: totalCost.currency,
@@ -225,6 +253,47 @@ function mapOfferToFlightOption(
     amenities,
     cancellationPolicy: 'strict',
   }
+}
+
+function resolveOfferBookingUrl(
+  offer: SerpFlightOffer,
+  fallbackBookingUrl: string,
+  preferences: TripPreferences,
+  departureId: string,
+  arrivalId: string
+): string {
+  const directUrl =
+    offer.booking_request?.url ||
+    offer.booking_url ||
+    offer.link
+
+  if (directUrl && /^https?:\/\//i.test(directUrl)) {
+    return directUrl
+  }
+
+  if (fallbackBookingUrl && /^https?:\/\//i.test(fallbackBookingUrl)) {
+    return fallbackBookingUrl
+  }
+
+  return buildGoogleFlightsSearchUrl(preferences, departureId, arrivalId)
+}
+
+function buildGoogleFlightsSearchUrl(
+  preferences: TripPreferences,
+  departureId: string,
+  arrivalId: string
+): string {
+  const queryParts = [
+    `Flights from ${departureId} to ${arrivalId}`,
+    `on ${preferences.departureDate}`,
+    preferences.tripType === 'round-trip' && preferences.returnDate
+      ? `return ${preferences.returnDate}`
+      : '',
+    `${Math.max(1, preferences.passengers.adults)} adults`,
+    preferences.preferences.cabinClass,
+  ].filter(Boolean)
+
+  return `https://www.google.com/travel/flights?q=${encodeURIComponent(queryParts.join(' '))}`
 }
 
 function buildTotalCostEstimateFromOffer(
