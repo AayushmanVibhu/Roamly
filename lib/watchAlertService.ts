@@ -64,9 +64,9 @@ export async function sendWatchMatchAlert(
   })
 
   return {
-    delivered: true,
+    delivered: false,
     provider: 'log',
-    message: 'No email provider configured; alert logged to server output.',
+    message: 'No email provider configured; alert logged to server output (not delivered by email).',
   }
 }
 

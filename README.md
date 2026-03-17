@@ -41,6 +41,7 @@ Roamly is not just another flight search engine. It's an intelligent travel comp
 
 See [AI_CONSTRAINT_EXTRACTION.md](docs/AI_CONSTRAINT_EXTRACTION.md) for full capabilities.
 See [MVP_SCOPE.md](docs/MVP_SCOPE.md) for the current product scope and definition of done.
+See [WATCH_CHECKER_SETUP.md](docs/WATCH_CHECKER_SETUP.md) for production watch automation.
 
 ### Smart Features
 
