@@ -69,6 +69,14 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .animate-fade-in-fast {
+    animation: fadeInFast 160ms ease-out;
+  }
+
+  .animate-sheet-enter {
+    animation: sheetEnterMobile 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
   
   /* Custom scrollbar for dark theme */
   .custom-scrollbar::-webkit-scrollbar {
@@ -86,5 +94,42 @@
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-dark-500;
+  }
+}
+
+@keyframes fadeInFast {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes sheetEnterMobile {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheetEnterDesktop {
+  from {
+    opacity: 0;
+    transform: translateX(26px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@media (min-width: 640px) {
+  .animate-sheet-enter {
+    animation: sheetEnterDesktop 220ms cubic-bezier(0.22, 1, 0.36, 1);
   }
 }

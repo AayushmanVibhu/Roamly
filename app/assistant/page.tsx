@@ -13,7 +13,16 @@ import {
   validateConstraints, 
   saveTripPreferences 
 } from '@/lib/tripPreferencesUtils'
-import { Plane, ArrowLeft, Sparkles, ArrowRight, SlidersHorizontal, X } from 'lucide-react'
+import {
+  Plane,
+  ArrowLeft,
+  Sparkles,
+  ArrowRight,
+  SlidersHorizontal,
+  X,
+  AlertTriangle,
+  CheckCircle2,
+} from 'lucide-react'
 
 // Generate contextual quick replies based on missing information
 const generateQuickReplies = (mergedConstraints: TravelConstraints): QuickReply[] => {
@@ -189,6 +198,9 @@ export default function AIAssistantPage() {
   const constraintsRef = useRef<TravelConstraints>({})
   const constraintCount = Object.keys(constraints).length
   const hasMinimumInfo = Boolean(constraints.origin && constraints.destination)
+  const requiredValidation = validateConstraints(constraints)
+  const missingRequiredFields = requiredValidation.missingFields
+  const hasMissingRequiredFields = missingRequiredFields.length > 0
 
   useEffect(() => {
     constraintsRef.current = constraints
@@ -416,7 +428,11 @@ export default function AIAssistantPage() {
               </Link>
               <button
                 onClick={() => setIsConstraintPanelOpen(true)}
-                className="hidden md:inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-dark-700 bg-dark-800/80 text-dark-200 hover:text-dark-50 transition"
+                className={`hidden md:inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border transition ${
+                  hasMissingRequiredFields
+                    ? 'border-yellow-700/40 bg-yellow-900/20 text-yellow-200 hover:text-yellow-100'
+                    : 'border-dark-700 bg-dark-800/80 text-dark-200 hover:text-dark-50'
+                }`}
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Trip details ({constraintCount})
@@ -437,10 +453,43 @@ export default function AIAssistantPage() {
         </div>
 
         <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-md p-3 sm:p-4">
-          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3">
+          <div className="max-w-6xl mx-auto space-y-3">
+            {hasMissingRequiredFields ? (
+              <div className="rounded-xl border border-yellow-700/30 bg-yellow-900/15 px-3 py-2">
+                <div className="flex items-start gap-2">
+                  <AlertTriangle className="w-4 h-4 text-yellow-300 mt-0.5 flex-shrink-0" />
+                  <div>
+                    <p className="text-xs font-medium text-yellow-200">Missing required trip details</p>
+                    <div className="flex flex-wrap gap-2 mt-1.5">
+                      {missingRequiredFields.map(field => (
+                        <span
+                          key={field}
+                          className="inline-flex items-center rounded-full bg-yellow-950/70 border border-yellow-700/40 px-2 py-0.5 text-[11px] text-yellow-100"
+                        >
+                          Add {field}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-green-700/30 bg-green-900/15 px-3 py-2 flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-green-300" />
+                <p className="text-xs text-green-200">
+                  Required details captured. You can search now or refine more constraints.
+                </p>
+              </div>
+            )}
+
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
             <button
               onClick={() => setIsConstraintPanelOpen(true)}
-              className="flex-1 text-left rounded-xl border border-dark-700 bg-dark-800/80 px-4 py-3 hover:border-dark-600 transition"
+              className={`flex-1 text-left rounded-xl border px-4 py-3 transition ${
+                hasMissingRequiredFields
+                  ? 'border-yellow-700/40 bg-yellow-900/10 hover:border-yellow-600/60'
+                  : 'border-dark-700 bg-dark-800/80 hover:border-dark-600'
+              }`}
             >
               <div className="flex items-center justify-between">
                 <div>
@@ -470,6 +519,7 @@ export default function AIAssistantPage() {
               {isGenerating ? 'Generating...' : 'Generate Recommendations'}
               {!isGenerating && <ArrowRight className="w-4 h-4" />}
             </button>
+            </div>
           </div>
         </div>
       </div>
@@ -477,16 +527,29 @@ export default function AIAssistantPage() {
       {isConstraintPanelOpen && (
         <div className="fixed inset-0 z-[60]">
           <button
-            className="absolute inset-0 bg-black/60"
+            className="absolute inset-0 bg-black/60 animate-fade-in-fast"
             aria-label="Close trip details panel"
             onClick={() => setIsConstraintPanelOpen(false)}
           />
 
-          <div className="absolute inset-x-0 bottom-0 h-[88vh] sm:inset-y-0 sm:right-0 sm:left-auto sm:h-full sm:w-[460px] bg-dark-900 border-t sm:border-t-0 sm:border-l border-dark-800 shadow-2xl flex flex-col">
+          <div className="absolute inset-x-0 bottom-0 h-[88vh] sm:inset-y-0 sm:right-0 sm:left-auto sm:h-full sm:w-[460px] bg-dark-900 border-t sm:border-t-0 sm:border-l border-dark-800 shadow-2xl flex flex-col animate-sheet-enter">
             <div className="flex items-center justify-between px-4 py-3 border-b border-dark-800">
-              <div>
+              <div className="min-w-0">
                 <h3 className="text-sm font-semibold text-dark-100">Trip details & watches</h3>
-                <p className="text-xs text-dark-400">Only shown when you need it</p>
+                {hasMissingRequiredFields ? (
+                  <div className="flex flex-wrap gap-1.5 mt-1">
+                    {missingRequiredFields.map(field => (
+                      <span
+                        key={`panel-${field}`}
+                        className="inline-flex items-center rounded-full border border-yellow-700/40 bg-yellow-900/20 px-2 py-0.5 text-[11px] text-yellow-200"
+                      >
+                        Missing: {field}
+                      </span>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-dark-400">Only shown when you need it</p>
+                )}
               </div>
               <button
                 onClick={() => setIsConstraintPanelOpen(false)}
