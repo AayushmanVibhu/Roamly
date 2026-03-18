@@ -391,7 +391,7 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-dark-950 flex flex-col">
+    <div className="h-[100dvh] bg-dark-950 flex flex-col">
       {/* Header */}
       <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -442,8 +442,8 @@ export default function AIAssistantPage() {
         </div>
       </nav>
 
-      <div className="flex-1 min-h-0 flex flex-col">
-        <div className="flex-1 min-h-0">
+      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
+        <div className="flex-1 min-h-0 overflow-hidden">
           <ChatPanel
             messages={messages}
             onSendMessage={handleSendMessage}
