@@ -13,7 +13,7 @@ import {
   validateConstraints, 
   saveTripPreferences 
 } from '@/lib/tripPreferencesUtils'
-import { Plane, ArrowLeft } from 'lucide-react'
+import { Plane, ArrowLeft, Sparkles, ArrowRight, SlidersHorizontal, X } from 'lucide-react'
 
 // Generate contextual quick replies based on missing information
 const generateQuickReplies = (mergedConstraints: TravelConstraints): QuickReply[] => {
@@ -185,7 +185,10 @@ export default function AIAssistantPage() {
   const [watchEmail, setWatchEmail] = useState('')
   const [watchStatusMessage, setWatchStatusMessage] = useState<string | null>(null)
   const [isCreatingWatch, setIsCreatingWatch] = useState(false)
+  const [isConstraintPanelOpen, setIsConstraintPanelOpen] = useState(false)
   const constraintsRef = useRef<TravelConstraints>({})
+  const constraintCount = Object.keys(constraints).length
+  const hasMinimumInfo = Boolean(constraints.origin && constraints.destination)
 
   useEffect(() => {
     constraintsRef.current = constraints
@@ -291,6 +294,7 @@ export default function AIAssistantPage() {
         timestamp: new Date(),
       }
       setMessages((prev) => [...prev, missingFieldsMessage])
+      setIsConstraintPanelOpen(true)
       return
     }
 
@@ -331,6 +335,7 @@ export default function AIAssistantPage() {
     const validation = validateConstraints(constraintsRef.current)
     if (!validation.isValid) {
       setWatchStatusMessage(`To create a watch, add: ${validation.missingFields.join(', ')}`)
+      setIsConstraintPanelOpen(true)
       return
     }
 
@@ -409,15 +414,20 @@ export default function AIAssistantPage() {
               >
                 My Watches
               </Link>
+              <button
+                onClick={() => setIsConstraintPanelOpen(true)}
+                className="hidden md:inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border border-dark-700 bg-dark-800/80 text-dark-200 hover:text-dark-50 transition"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Trip details ({constraintCount})
+              </button>
             </div>
           </div>
         </div>
       </nav>
 
-      {/* Main Content - Two Panel Layout */}
-      <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel - Chat */}
-        <div className="w-full lg:w-1/2 border-r border-dark-800">
+      <div className="flex-1 min-h-0 flex flex-col">
+        <div className="flex-1 min-h-0">
           <ChatPanel
             messages={messages}
             onSendMessage={handleSendMessage}
@@ -426,46 +436,87 @@ export default function AIAssistantPage() {
           />
         </div>
 
-        {/* Right Panel - Summary */}
-        <div className="hidden lg:flex lg:w-1/2 flex-col">
-          <div className="flex-1 overflow-hidden">
-            <ConstraintSummaryPanel
-              constraints={constraints}
-              onRemoveConstraint={handleRemoveConstraint}
-            />
+        <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-md p-3 sm:p-4">
+          <div className="max-w-6xl mx-auto flex flex-col sm:flex-row sm:items-center gap-3">
+            <button
+              onClick={() => setIsConstraintPanelOpen(true)}
+              className="flex-1 text-left rounded-xl border border-dark-700 bg-dark-800/80 px-4 py-3 hover:border-dark-600 transition"
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm font-medium text-dark-100">Trip details</p>
+                  {constraintCount > 0 ? (
+                    <p className="text-xs text-dark-400 mt-0.5">
+                      {constraintCount} captured • {hasMinimumInfo ? 'Ready to search' : 'Need origin and destination'}
+                    </p>
+                  ) : (
+                    <p className="text-xs text-dark-400 mt-0.5">No constraints yet — click to review or edit</p>
+                  )}
+                </div>
+                <SlidersHorizontal className="w-4 h-4 text-primary-400" />
+              </div>
+            </button>
+
+            <button
+              onClick={handleGenerateRecommendations}
+              disabled={!hasMinimumInfo || isGenerating}
+              className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold transition ${
+                !hasMinimumInfo || isGenerating
+                  ? 'bg-dark-800 text-dark-600 cursor-not-allowed'
+                  : 'bg-gradient-to-r from-primary-600 to-purple-600 text-white hover:from-primary-700 hover:to-purple-700'
+              }`}
+            >
+              <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+              {isGenerating ? 'Generating...' : 'Generate Recommendations'}
+              {!isGenerating && <ArrowRight className="w-4 h-4" />}
+            </button>
           </div>
-          <RecommendationTrigger
-            constraints={constraints}
-            onGenerateRecommendations={handleGenerateRecommendations}
-            isGenerating={isGenerating}
-            watchEmail={watchEmail}
-            onWatchEmailChange={setWatchEmail}
-            onCreateWatch={handleCreateWatch}
-            isCreatingWatch={isCreatingWatch}
-            watchStatusMessage={watchStatusMessage}
-          />
         </div>
       </div>
 
-      {/* Mobile Summary (Bottom Sheet Style) */}
-      <div className="lg:hidden border-t border-dark-800 bg-dark-900">
-        <div className="max-h-64 overflow-y-auto">
-          <ConstraintSummaryPanel
-            constraints={constraints}
-            onRemoveConstraint={handleRemoveConstraint}
+      {isConstraintPanelOpen && (
+        <div className="fixed inset-0 z-[60]">
+          <button
+            className="absolute inset-0 bg-black/60"
+            aria-label="Close trip details panel"
+            onClick={() => setIsConstraintPanelOpen(false)}
           />
+
+          <div className="absolute inset-x-0 bottom-0 h-[88vh] sm:inset-y-0 sm:right-0 sm:left-auto sm:h-full sm:w-[460px] bg-dark-900 border-t sm:border-t-0 sm:border-l border-dark-800 shadow-2xl flex flex-col">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-dark-800">
+              <div>
+                <h3 className="text-sm font-semibold text-dark-100">Trip details & watches</h3>
+                <p className="text-xs text-dark-400">Only shown when you need it</p>
+              </div>
+              <button
+                onClick={() => setIsConstraintPanelOpen(false)}
+                className="inline-flex items-center justify-center rounded-lg p-2 text-dark-400 hover:text-dark-100 hover:bg-dark-800 transition"
+                aria-label="Close trip details panel"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="flex-1 min-h-0 overflow-hidden">
+              <ConstraintSummaryPanel
+                constraints={constraints}
+                onRemoveConstraint={handleRemoveConstraint}
+              />
+            </div>
+
+            <RecommendationTrigger
+              constraints={constraints}
+              onGenerateRecommendations={handleGenerateRecommendations}
+              isGenerating={isGenerating}
+              watchEmail={watchEmail}
+              onWatchEmailChange={setWatchEmail}
+              onCreateWatch={handleCreateWatch}
+              isCreatingWatch={isCreatingWatch}
+              watchStatusMessage={watchStatusMessage}
+            />
+          </div>
         </div>
-        <RecommendationTrigger
-          constraints={constraints}
-          onGenerateRecommendations={handleGenerateRecommendations}
-          isGenerating={isGenerating}
-          watchEmail={watchEmail}
-          onWatchEmailChange={setWatchEmail}
-          onCreateWatch={handleCreateWatch}
-          isCreatingWatch={isCreatingWatch}
-          watchStatusMessage={watchStatusMessage}
-        />
-      </div>
+      )}
     </div>
   )
 }
