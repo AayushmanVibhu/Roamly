@@ -10,6 +10,7 @@
   }
 
   body {
+    font-family: var(--font-inter), system-ui, sans-serif;
     color: rgb(var(--foreground-rgb));
     background: linear-gradient(
         to bottom,
@@ -20,6 +21,14 @@
     min-height: 100vh;
   }
 
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+    letter-spacing: -0.02em;
+  }
+
   /* Smooth scrolling */
   html {
     scroll-behavior: smooth;
@@ -28,6 +37,31 @@
   /* Remove default button styles */
   button {
     -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  .roamly-shell {
+    @apply min-h-screen bg-gradient-to-br from-dark-950 via-[#061022] to-dark-950;
+    background-image:
+      radial-gradient(circle at 12% 18%, rgba(56, 189, 248, 0.2) 0, transparent 34%),
+      radial-gradient(circle at 82% 20%, rgba(147, 51, 234, 0.18) 0, transparent 30%);
+  }
+
+  .roamly-glass {
+    @apply border border-dark-700/80 bg-dark-900/65 backdrop-blur-md shadow-[0_10px_40px_-20px_rgba(56,189,248,0.45)];
+  }
+
+  .roamly-btn-primary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-primary-500 to-purple-600 px-5 py-2.5 font-semibold text-white transition hover:from-primary-400 hover:to-purple-500;
+  }
+
+  .roamly-btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl border border-dark-600 bg-dark-900/70 px-5 py-2.5 font-semibold text-dark-100 transition hover:border-dark-500 hover:bg-dark-800;
+  }
+
+  .roamly-pill {
+    @apply inline-flex items-center gap-2 rounded-full border border-primary-700/40 bg-primary-900/30 px-3 py-1 text-xs font-medium text-primary-200;
   }
 }
 

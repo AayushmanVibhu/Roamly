@@ -32,6 +32,7 @@ interface RecommendationCardProps {
 export default function RecommendationCard({ recommendation, rank }: RecommendationCardProps) {
   const [isExpanded, setIsExpanded] = useState(false)
   const { flight, score, tags, aiSummary, constraintMatch } = recommendation
+  const isGoogleFlightsLink = flight.bookingUrl?.includes('google.com/travel/flights')
 
   // Format duration from minutes to hours and minutes
   const formatDuration = (minutes: number) => {
@@ -55,10 +56,11 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
   }
 
   return (
-    <div className="bg-dark-800 border border-dark-700 rounded-2xl shadow-lg hover:shadow-xl transition-shadow overflow-hidden">
+    <div className="rounded-2xl bg-gradient-to-br from-primary-700/20 via-dark-700/70 to-purple-700/20 p-[1px]">
+      <div className="roamly-glass rounded-2xl overflow-hidden">
       {/* Rank Badge */}
       {rank === 1 && (
-        <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-900 px-4 py-2 flex items-center gap-2 font-semibold">
+        <div className="bg-gradient-to-r from-yellow-400 to-yellow-500 text-yellow-950 px-4 py-2 flex items-center gap-2 font-semibold">
           <Award className="w-5 h-5" />
           <span>Best Overall Choice</span>
         </div>
@@ -180,9 +182,9 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
                 href={flight.bookingUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full bg-primary-600 text-white py-3 rounded-lg hover:bg-primary-700 transition font-semibold mt-4 inline-flex items-center justify-center gap-2"
+                className="roamly-btn-primary w-full mt-4"
               >
-                Select Flight
+                {isGoogleFlightsLink ? 'View on Google Flights' : 'Book with Provider'}
                 <ExternalLink className="w-4 h-4" />
               </a>
             ) : (
@@ -293,7 +295,7 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
                   </div>
                 ))}
               </div>
-              <div className="mt-4 p-3 bg-primary-900/20 rounded-lg text-sm text-dark-50">
+              <div className="mt-4 p-3 bg-primary-900/20 border border-primary-800/40 rounded-lg text-sm text-dark-50">
                 <strong>Note:</strong> Price score includes base fare + baggage fees. Comfort score considers included baggage allowance.
               </div>
             </div>
@@ -339,6 +341,7 @@ export default function RecommendationCard({ recommendation, rank }: Recommendat
           </div>
         )}
       </div>
+    </div>
     </div>
   )
 }

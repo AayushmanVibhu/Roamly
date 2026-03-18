@@ -178,9 +178,9 @@ export default function ResultsPage() {
   const sortedRecommendations = getSortedRecommendations()
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
+    <div className="roamly-shell">
       {/* Navigation */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-dark-800/80 bg-dark-950/70 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
@@ -189,7 +189,7 @@ export default function ResultsPage() {
                 Roamly
               </span>
             </Link>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 text-sm">
               <Link
                 href="/assistant"
                 className="flex items-center gap-2 text-dark-300 hover:text-dark-50 transition text-sm"
@@ -216,19 +216,19 @@ export default function ResultsPage() {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
-        <div className="mb-8">
-          <div className="flex items-center gap-2 text-sm text-dark-300 mb-4">
+        <div className="mb-8 roamly-glass rounded-2xl p-5 md:p-6">
+          <div className="flex items-center gap-2 text-sm text-dark-300 mb-3">
             <Sparkles className="w-4 h-4 text-primary-600" />
             <span>AI-Powered Recommendations</span>
           </div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-green-700/40 bg-green-900/20 text-green-300 text-xs mb-3">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-green-700/40 bg-green-900/20 text-green-300 text-xs mb-4">
             <span>Live source: {dataSource}</span>
             {sortedRecommendations[0]?.flight?.id && (
               <span className="opacity-80">• {sortedRecommendations[0].flight.id}</span>
             )}
           </div>
-          <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">
-            Best Options for Your Trip
+          <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2 text-balance">
+            Top matches for your trip
           </h1>
           <p className="text-lg text-dark-300">
             {preferences.origin} → {preferences.destination} • {preferences.departureDate}
@@ -237,7 +237,7 @@ export default function ResultsPage() {
         </div>
 
         {/* Controls */}
-        <div className="mb-6 bg-dark-800 border border-dark-700 rounded-xl p-4">
+        <div className="mb-6 roamly-glass rounded-2xl p-4">
           <h3 className="text-dark-50 font-semibold mb-2">Track this trip automatically</h3>
           <p className="text-sm text-dark-300 mb-3">
             If this option is not available now, Roamly can keep checking and alert you when a matching deal appears.
@@ -248,12 +248,12 @@ export default function ResultsPage() {
               value={watchEmail}
               onChange={e => setWatchEmail(e.target.value)}
               placeholder="Enter email for alerts"
-              className="flex-1 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
+              className="flex-1 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500 outline-none focus:border-primary-500"
             />
             <button
               onClick={handleCreateWatch}
               disabled={isCreatingWatch}
-              className="px-4 py-2 rounded-lg bg-primary-600 text-white hover:bg-primary-700 disabled:opacity-60"
+              className="roamly-btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
             >
               {isCreatingWatch ? 'Creating Watch...' : 'Create Watch'}
             </button>
@@ -263,7 +263,7 @@ export default function ResultsPage() {
           )}
         </div>
 
-        <div className="flex flex-col md:flex-row gap-4 mb-8 bg-dark-800 border border-dark-700 rounded-xl p-4 shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4 mb-8 roamly-glass rounded-2xl p-4">
           <div className="flex items-center gap-2">
             <Filter className="w-5 h-5 text-dark-300" />
             <span className="font-medium text-dark-200">Sort by:</span>
@@ -271,30 +271,30 @@ export default function ResultsPage() {
           <div className="flex gap-2 flex-wrap">
             <button
               onClick={() => setSortBy('score')}
-              className={`px-4 py-2 rounded-lg transition ${
+              className={`px-4 py-2 rounded-full transition text-sm font-medium ${
                 sortBy === 'score'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-dark-700 hover:bg-dark-600 text-dark-200'
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-dark-800 hover:bg-dark-700 text-dark-200 border border-dark-700'
               }`}
             >
               Best Match
             </button>
             <button
               onClick={() => setSortBy('price')}
-              className={`px-4 py-2 rounded-lg transition ${
+              className={`px-4 py-2 rounded-full transition text-sm font-medium ${
                 sortBy === 'price'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-dark-700 hover:bg-dark-600 text-dark-200'
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-dark-800 hover:bg-dark-700 text-dark-200 border border-dark-700'
               }`}
             >
               Lowest Price
             </button>
             <button
               onClick={() => setSortBy('duration')}
-              className={`px-4 py-2 rounded-lg transition ${
+              className={`px-4 py-2 rounded-full transition text-sm font-medium ${
                 sortBy === 'duration'
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-dark-700 hover:bg-dark-600 text-dark-200'
+                  ? 'bg-primary-500 text-white'
+                  : 'bg-dark-800 hover:bg-dark-700 text-dark-200 border border-dark-700'
               }`}
             >
               Fastest
@@ -323,7 +323,7 @@ export default function ResultsPage() {
         </div>
 
         {/* Travel Score Explanation */}
-        <div className="mt-12 bg-gradient-to-r from-blue-900/20 to-indigo-900/20 border border-blue-700/30 rounded-xl p-8">
+        <div className="mt-12 roamly-glass rounded-2xl p-8">
           <h3 className="text-xl font-bold text-dark-50 mb-4 flex items-center gap-2">
             <span className="text-2xl">🎯</span> How We Score Travel Options
           </h3>
@@ -331,7 +331,7 @@ export default function ResultsPage() {
             Each option receives a comprehensive Travel Score (0-100) based on multiple factors:
           </p>
           <div className="grid md:grid-cols-2 gap-4">
-            <div className="bg-dark-800 border border-dark-700 rounded-lg p-4">
+            <div className="bg-dark-900/70 border border-dark-700 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">💰</span>
                 <span className="font-semibold text-dark-50">Cost Efficiency (30%)</span>
@@ -340,7 +340,7 @@ export default function ResultsPage() {
                 How well the price fits your budget, including base fare and baggage fees
               </p>
             </div>
-            <div className="bg-dark-800 border border-dark-700 rounded-lg p-4">
+            <div className="bg-dark-900/70 border border-dark-700 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">⚡</span>
                 <span className="font-semibold text-dark-50">Convenience (25%)</span>
@@ -349,7 +349,7 @@ export default function ResultsPage() {
                 Travel time, number of layovers, and connection quality
               </p>
             </div>
-            <div className="bg-dark-800 border border-dark-700 rounded-lg p-4">
+            <div className="bg-dark-900/70 border border-dark-700 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">✨</span>
                 <span className="font-semibold text-dark-50">Comfort (20%)</span>
@@ -358,7 +358,7 @@ export default function ResultsPage() {
                 Cabin class, amenities, baggage allowance, and legroom
               </p>
             </div>
-            <div className="bg-dark-800 border border-dark-700 rounded-lg p-4">
+            <div className="bg-dark-900/70 border border-dark-700 rounded-lg p-4">
               <div className="flex items-center gap-2 mb-2">
                 <span className="text-xl">🛡️</span>
                 <span className="font-semibold text-dark-50">Reliability (15%)</span>
@@ -371,7 +371,7 @@ export default function ResultsPage() {
         </div>
 
         {/* Additional Info */}
-        <div className="mt-8 bg-gradient-to-r from-primary-900/20 to-purple-900/20 border border-primary-700/30 rounded-xl p-8">
+        <div className="mt-8 roamly-glass rounded-2xl p-8">
           <h3 className="text-xl font-bold text-dark-50 mb-4">💡 Smart Booking Tips</h3>
           <ul className="space-y-3 text-dark-200">
             <li className="flex items-start gap-2">
