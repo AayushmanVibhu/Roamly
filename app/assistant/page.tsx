@@ -13,16 +13,7 @@ import {
   validateConstraints, 
   saveTripPreferences 
 } from '@/lib/tripPreferencesUtils'
-import {
-  Plane,
-  ArrowLeft,
-  Sparkles,
-  ArrowRight,
-  SlidersHorizontal,
-  X,
-  AlertTriangle,
-  CheckCircle2,
-} from 'lucide-react'
+import { Plane, ArrowLeft, SlidersHorizontal, X, Sparkles } from 'lucide-react'
 
 // Generate contextual quick replies based on missing information
 const generateQuickReplies = (mergedConstraints: TravelConstraints): QuickReply[] => {
@@ -179,7 +170,7 @@ export default function AIAssistantPage() {
       id: 'welcome',
       role: 'assistant',
       content:
-        "👋 Hi! I'm your AI travel assistant. I'll help you find the perfect flights step by step.\n\nYou can chat naturally like:\n• \"I want to fly from Phoenix to New York next month under $400\"\n\nOr use the quick buttons below to get started!",
+        "👋 Hi! I'm your AI travel assistant. I'll help you find the perfect flights step by step.\n\nYou can chat naturally like:\n• \"I want to fly from Phoenix to New York next month under $400\"\n\nI’ll ask follow-up questions only when needed.",
       timestamp: new Date(),
       quickReplies: [
         { label: 'New York', field: 'origin', value: 'New York (NYC)' },
@@ -196,11 +187,16 @@ export default function AIAssistantPage() {
   const [isCreatingWatch, setIsCreatingWatch] = useState(false)
   const [isConstraintPanelOpen, setIsConstraintPanelOpen] = useState(false)
   const constraintsRef = useRef<TravelConstraints>({})
-  const constraintCount = Object.keys(constraints).length
-  const hasMinimumInfo = Boolean(constraints.origin && constraints.destination)
-  const requiredValidation = validateConstraints(constraints)
-  const missingRequiredFields = requiredValidation.missingFields
-  const hasMissingRequiredFields = missingRequiredFields.length > 0
+  const hasMinimumInfo = validateConstraints(constraints).isValid
+
+  useEffect(() => {
+    const seededPrompt = sessionStorage.getItem('roamlyChatPrompt')
+    if (seededPrompt?.trim()) {
+      handleSendMessage(seededPrompt.trim())
+      sessionStorage.removeItem('roamlyChatPrompt')
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     constraintsRef.current = constraints
@@ -231,27 +227,6 @@ export default function AIAssistantPage() {
         setConstraints((prev) => ({ ...prev, ...aiMessage.extractedConstraints }))
       }
     }, 500)
-  }
-
-  const handleQuickConstraint = (field: keyof TravelConstraints, value: any, message: string) => {
-    // Add user message
-    const userMessage: ChatMessage = {
-      id: `user-${Date.now()}`,
-      role: 'user',
-      content: message,
-      timestamp: new Date(),
-    }
-    setMessages((prev) => [...prev, userMessage])
-
-    // Update constraint
-    setConstraints((prev) => ({ ...prev, [field]: value }))
-
-    // Add confirmation message
-    setTimeout(() => {
-      const mergedConstraints = { ...constraintsRef.current, [field]: value }
-      const aiMessage = generateMockResponse('', mergedConstraints)
-      setMessages((prev) => [...prev, aiMessage])
-    }, 300)
   }
 
   const handleQuickReply = (reply: QuickReply) => {
@@ -391,9 +366,9 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <div className="h-[100dvh] bg-dark-950 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex flex-col">
       {/* Header */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
@@ -408,175 +383,112 @@ export default function AIAssistantPage() {
               </div>
             </div>
             <div className="flex items-center gap-4">
+              <button
+                onClick={() => setIsConstraintPanelOpen(true)}
+                className="inline-flex items-center gap-2 rounded-full border border-dark-700 bg-dark-800/90 px-3 py-1.5 text-xs text-dark-200 hover:text-dark-50 transition"
+              >
+                <SlidersHorizontal className="w-3.5 h-3.5" />
+                Trip details
+              </button>
               <Link
                 href="/planner"
-                className="text-dark-300 hover:text-dark-50 transition text-sm"
+                className="hidden sm:inline text-dark-300 hover:text-dark-50 transition text-sm"
               >
                 Classic Form
               </Link>
               <Link
                 href="/dashboard"
-                className="text-dark-300 hover:text-dark-50 transition text-sm"
+                className="hidden sm:inline text-dark-300 hover:text-dark-50 transition text-sm"
               >
                 Dashboard
               </Link>
               <Link
                 href="/watches"
-                className="text-dark-300 hover:text-dark-50 transition text-sm"
+                className="hidden sm:inline text-dark-300 hover:text-dark-50 transition text-sm"
               >
                 My Watches
               </Link>
-              <button
-                onClick={() => setIsConstraintPanelOpen(true)}
-                className={`hidden md:inline-flex items-center gap-2 text-xs px-3 py-1.5 rounded-full border transition ${
-                  hasMissingRequiredFields
-                    ? 'border-yellow-700/40 bg-yellow-900/20 text-yellow-200 hover:text-yellow-100'
-                    : 'border-dark-700 bg-dark-800/80 text-dark-200 hover:text-dark-50'
-                }`}
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                Trip details ({constraintCount})
-              </button>
             </div>
           </div>
         </div>
       </nav>
 
-      <div className="flex-1 min-h-0 flex flex-col overflow-hidden">
-        <div className="flex-1 min-h-0 overflow-hidden">
+      {/* Main Content - Chat First */}
+      <div className="flex-1 min-h-0 overflow-hidden">
+        <div className="max-w-4xl h-full mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <ChatPanel
             messages={messages}
             onSendMessage={handleSendMessage}
-            onQuickConstraint={handleQuickConstraint}
             onQuickReply={handleQuickReply}
           />
         </div>
+      </div>
 
-        <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-md p-3 sm:p-4">
-          <div className="max-w-6xl mx-auto space-y-3">
-            {hasMissingRequiredFields ? (
-              <div className="rounded-xl border border-yellow-700/30 bg-yellow-900/15 px-3 py-2">
-                <div className="flex items-start gap-2">
-                  <AlertTriangle className="w-4 h-4 text-yellow-300 mt-0.5 flex-shrink-0" />
-                  <div>
-                    <p className="text-xs font-medium text-yellow-200">Missing required trip details</p>
-                    <div className="flex flex-wrap gap-2 mt-1.5">
-                      {missingRequiredFields.map(field => (
-                        <span
-                          key={field}
-                          className="inline-flex items-center rounded-full bg-yellow-950/70 border border-yellow-700/40 px-2 py-0.5 text-[11px] text-yellow-100"
-                        >
-                          Add {field}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="rounded-xl border border-green-700/30 bg-green-900/15 px-3 py-2 flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-green-300" />
-                <p className="text-xs text-green-200">
-                  Required details captured. You can search now or refine more constraints.
-                </p>
-              </div>
-            )}
-
-            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
-            <button
-              onClick={() => setIsConstraintPanelOpen(true)}
-              className={`flex-1 text-left rounded-xl border px-4 py-3 transition ${
-                hasMissingRequiredFields
-                  ? 'border-yellow-700/40 bg-yellow-900/10 hover:border-yellow-600/60'
-                  : 'border-dark-700 bg-dark-800/80 hover:border-dark-600'
-              }`}
-            >
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-dark-100">Trip details</p>
-                  {constraintCount > 0 ? (
-                    <p className="text-xs text-dark-400 mt-0.5">
-                      {constraintCount} captured • {hasMinimumInfo ? 'Ready to search' : 'Need origin and destination'}
-                    </p>
-                  ) : (
-                    <p className="text-xs text-dark-400 mt-0.5">No constraints yet — click to review or edit</p>
-                  )}
-                </div>
-                <SlidersHorizontal className="w-4 h-4 text-primary-400" />
-              </div>
-            </button>
-
-            <button
-              onClick={handleGenerateRecommendations}
-              disabled={!hasMinimumInfo || isGenerating}
-              className={`inline-flex items-center justify-center gap-2 rounded-xl px-5 py-3 font-semibold transition ${
-                !hasMinimumInfo || isGenerating
-                  ? 'bg-dark-800 text-dark-600 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-primary-600 to-purple-600 text-white hover:from-primary-700 hover:to-purple-700'
-              }`}
-            >
-              <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
-              {isGenerating ? 'Generating...' : 'Generate Recommendations'}
-              {!isGenerating && <ArrowRight className="w-4 h-4" />}
-            </button>
-            </div>
-          </div>
+      <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-sm px-4 sm:px-6 py-3">
+        <div className="max-w-4xl mx-auto flex items-center gap-3">
+          <button
+            onClick={() => setIsConstraintPanelOpen(true)}
+            className="inline-flex items-center gap-2 rounded-xl border border-dark-700 bg-dark-800/80 px-4 py-2.5 text-sm text-dark-100 hover:bg-dark-800 transition"
+          >
+            <SlidersHorizontal className="w-4 h-4 text-primary-400" />
+            Trip details
+          </button>
+          <button
+            onClick={handleGenerateRecommendations}
+            disabled={isGenerating}
+            className={`ml-auto inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
+              isGenerating
+                ? 'bg-dark-800 text-dark-500 cursor-not-allowed'
+                : hasMinimumInfo
+                  ? 'bg-gradient-to-r from-primary-600 to-purple-600 text-white hover:from-primary-700 hover:to-purple-700'
+                  : 'bg-dark-800 text-dark-300 hover:bg-dark-700'
+            }`}
+          >
+            <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
+            {isGenerating ? 'Generating...' : hasMinimumInfo ? 'Generate recommendations' : 'Complete trip details'}
+          </button>
         </div>
       </div>
 
       {isConstraintPanelOpen && (
-        <div className="fixed inset-0 z-[60]">
+        <div className="fixed inset-0 z-[70] flex items-end sm:items-center justify-center">
           <button
-            className="absolute inset-0 bg-black/60 animate-fade-in-fast"
-            aria-label="Close trip details panel"
             onClick={() => setIsConstraintPanelOpen(false)}
+            className="absolute inset-0 bg-black/60"
+            aria-label="Close trip details panel"
           />
-
-          <div className="absolute inset-x-0 bottom-0 h-[88vh] sm:inset-y-0 sm:right-0 sm:left-auto sm:h-full sm:w-[460px] bg-dark-900 border-t sm:border-t-0 sm:border-l border-dark-800 shadow-2xl flex flex-col animate-sheet-enter">
-            <div className="flex items-center justify-between px-4 py-3 border-b border-dark-800">
-              <div className="min-w-0">
-                <h3 className="text-sm font-semibold text-dark-100">Trip details & watches</h3>
-                {hasMissingRequiredFields ? (
-                  <div className="flex flex-wrap gap-1.5 mt-1">
-                    {missingRequiredFields.map(field => (
-                      <span
-                        key={`panel-${field}`}
-                        className="inline-flex items-center rounded-full border border-yellow-700/40 bg-yellow-900/20 px-2 py-0.5 text-[11px] text-yellow-200"
-                      >
-                        Missing: {field}
-                      </span>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-xs text-dark-400">Only shown when you need it</p>
-                )}
+          <div className="relative w-full sm:max-w-lg bg-dark-900 border border-dark-800 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-hidden animate-sheet-enter">
+            <div className="px-4 py-3 border-b border-dark-800 flex items-center justify-between">
+              <div>
+                <h3 className="text-sm font-semibold text-dark-100">Trip details</h3>
+                <p className="text-xs text-dark-400">Open only when you need it</p>
               </div>
               <button
                 onClick={() => setIsConstraintPanelOpen(false)}
-                className="inline-flex items-center justify-center rounded-lg p-2 text-dark-400 hover:text-dark-100 hover:bg-dark-800 transition"
+                className="p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-800 transition"
                 aria-label="Close trip details panel"
               >
                 <X className="w-4 h-4" />
               </button>
             </div>
-
-            <div className="flex-1 min-h-0 overflow-hidden">
+            <div className="max-h-[calc(88vh-3.5rem)] overflow-y-auto">
               <ConstraintSummaryPanel
                 constraints={constraints}
                 onRemoveConstraint={handleRemoveConstraint}
               />
             </div>
-
-            <RecommendationTrigger
-              constraints={constraints}
-              onGenerateRecommendations={handleGenerateRecommendations}
-              isGenerating={isGenerating}
-              watchEmail={watchEmail}
-              onWatchEmailChange={setWatchEmail}
-              onCreateWatch={handleCreateWatch}
-              isCreatingWatch={isCreatingWatch}
-              watchStatusMessage={watchStatusMessage}
-            />
+            <div className="border-t border-dark-800 p-3">
+              <RecommendationTrigger
+                constraints={constraints}
+                onGenerateRecommendations={handleGenerateRecommendations}
+                isGenerating={isGenerating}
+                watchEmail={watchEmail}
+                onWatchEmailChange={setWatchEmail}
+                onCreateWatch={handleCreateWatch}
+                isCreatingWatch={isCreatingWatch}
+                watchStatusMessage={watchStatusMessage}
+              />
+            </div>
           </div>
         </div>
       )}
