@@ -104,7 +104,7 @@ export default function ChatPanel({ messages, onSendMessage, onQuickReply }: Cha
             type="submit"
             disabled={!input.trim()}
             aria-label="Send message"
-            className="bg-primary-600 hover:bg-primary-700 disabled:bg-dark-800 disabled:text-dark-600 text-white px-4 py-3 rounded-xl transition flex items-center justify-center"
+            className="bg-primary-700 hover:bg-primary-800 disabled:bg-dark-800 disabled:text-dark-600 text-white px-4 py-3 rounded-xl transition flex items-center justify-center"
           >
             <Send className="w-5 h-5" />
           </button>

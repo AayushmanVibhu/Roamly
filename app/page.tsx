@@ -82,10 +82,10 @@ export default function Home() {
                 <Plane className="w-7 h-7 text-white" />
                 <span className="text-2xl font-bold text-white">Roamly</span>
               </Link>
-              <div className="hidden md:flex items-center gap-6 text-white text-sm">
-                <Link href="/results" className="hover:text-white/80 transition">Results</Link>
-                <Link href="/assistant" className="hover:text-white/80 transition">Chat input</Link>
-                <Link href="/watches" className="hover:text-white/80 transition">My Watches</Link>
+              <div className="hidden md:flex items-center gap-4 text-white text-sm">
+                <Link href="/results" className="hover:text-white/80 transition py-2 px-2">Results</Link>
+                <Link href="/assistant" className="hover:text-white/80 transition py-2 px-2">Chat input</Link>
+                <Link href="/watches" className="hover:text-white/80 transition py-2 px-2">My Watches</Link>
               </div>
             </div>
           </div>
@@ -197,7 +197,7 @@ export default function Home() {
                       <select
                         value={baggage}
                         onChange={e => setBaggage(e.target.value as BaggagePreference)}
-                        className="w-full bg-transparent text-slate-900 outline-none"
+                        className="w-full bg-transparent text-slate-900 outline-none min-h-[24px]"
                       >
                         <option value="none">None</option>
                         <option value="carry-on">Carry-on</option>

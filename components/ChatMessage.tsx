@@ -22,7 +22,7 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
           className={`max-w-[80%] rounded-2xl px-4 py-3 ${
             isAssistant
               ? 'bg-dark-800 text-dark-100 border border-dark-700'
-              : 'bg-primary-600 text-white'
+              : 'bg-primary-700 text-white'
           }`}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>

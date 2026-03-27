@@ -187,26 +187,26 @@ export default function ResultsPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center">
         <div className="text-center text-dark-50" role="status">
           <div className="h-12 w-12 border-4 border-white/40 border-t-white rounded-full animate-spin mx-auto mb-4" />
           <p>Finding beautiful options for your route...</p>
         </div>
-      </div>
+      </main>
     )
   }
 
   if (!preferences) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center">
+      <main className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950 flex items-center justify-center">
         <div className="text-center max-w-md px-4">
           <h2 className="text-2xl font-semibold text-dark-50 mb-3">No trip details found</h2>
           <p className="text-dark-300 mb-6">Start with a route and dates first.</p>
-          <Link href="/" className="inline-flex items-center gap-2 rounded-xl bg-primary-600 text-white px-5 py-3 font-medium hover:bg-primary-700 transition">
+          <Link href="/" className="inline-flex items-center gap-2 rounded-xl bg-primary-700 text-white px-5 py-3 font-medium hover:bg-primary-800 transition">
             Go to search
           </Link>
         </div>
-      </div>
+      </main>
     )
   }
 
@@ -322,7 +322,7 @@ export default function ResultsPage() {
                   <button
                     onClick={confirmTracking}
                     disabled={isSavingWatch}
-                    className="rounded-xl bg-primary-600 px-5 py-2.5 text-white font-semibold hover:bg-primary-700 transition disabled:opacity-60"
+                    className="rounded-xl bg-primary-700 px-5 py-2.5 text-white font-semibold hover:bg-primary-800 transition disabled:opacity-60"
                   >
                     {isSavingWatch ? 'Saving...' : 'Confirm tracking'}
                   </button>
@@ -337,7 +337,7 @@ export default function ResultsPage() {
                 <p className="mt-2 text-dark-300">We&apos;ll keep watching this route for you.</p>
                 <button
                   onClick={closeTrackModal}
-                  className="mt-6 rounded-xl bg-primary-600 px-5 py-2.5 text-white font-semibold hover:bg-primary-700 transition"
+                  className="mt-6 rounded-xl bg-primary-700 px-5 py-2.5 text-white font-semibold hover:bg-primary-800 transition"
                 >
                   Done
                 </button>

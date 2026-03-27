@@ -134,12 +134,12 @@ export default function WatchesPage() {
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter email used for watch alerts"
               aria-label="Email used for watch alerts"
-              className="flex-1 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
+              className="flex-1 px-3 py-3 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
             />
             <button
               onClick={() => loadWatches(email, filter)}
               disabled={isLoading}
-              className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-60 inline-flex items-center gap-2"
+              className="px-4 py-2 rounded-lg bg-primary-700 hover:bg-primary-800 text-white disabled:opacity-60 inline-flex items-center gap-2"
             >
               <RefreshCcw className="w-4 h-4" />
               {isLoading ? 'Loading...' : 'Load Watches'}
@@ -154,7 +154,7 @@ export default function WatchesPage() {
                   void loadWatches(email, status)
                 }}
                 aria-pressed={filter === status}
-                className={`px-3 py-1 rounded-full text-xs border capitalize ${
+                className={`px-3 py-2 rounded-full text-xs border capitalize ${
                   filter === status
                     ? 'bg-primary-900/30 text-primary-300 border-primary-700/40'
                     : 'bg-dark-900 text-dark-300 border-dark-700'

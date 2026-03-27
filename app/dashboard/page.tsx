@@ -23,17 +23,17 @@ export default function DashboardPage() {
                 Roamly
               </span>
             </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-dark-300 hover:text-dark-50 transition">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-dark-300 hover:text-dark-50 transition py-2 px-2">
                 Home
               </Link>
-              <Link href="/planner" className="text-dark-300 hover:text-dark-50 transition">
+              <Link href="/planner" className="text-dark-300 hover:text-dark-50 transition py-2 px-2">
                 Plan Trip
               </Link>
-              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
+              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition py-2 px-2">
                 My Watches
               </Link>
-              <Link href="/dashboard" className="text-primary-400 font-medium" aria-current="page">
+              <Link href="/dashboard" className="text-primary-400 font-medium py-2 px-2" aria-current="page">
                 Dashboard
               </Link>
             </div>
@@ -121,7 +121,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold text-dark-50">Your Saved Trips</h2>
             <Link
               href="/planner"
-              className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition"
+              className="flex items-center gap-2 bg-primary-700 text-white px-4 py-2 rounded-lg hover:bg-primary-800 transition"
             >
               <Plus className="w-4 h-4" />
               New Trip
