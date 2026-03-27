@@ -13,8 +13,8 @@ export default function DashboardPage() {
   const savedTrips: Array<never> = []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50" aria-label="Main navigation">
+    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950">
+      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
