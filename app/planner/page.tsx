@@ -35,14 +35,15 @@ export default function PlannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      {/* Navigation */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="relative min-h-screen scenic-bg">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+              <Plane className="w-8 h-8 text-primary-500" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                 Roamly
               </span>
             </Link>
@@ -59,12 +60,10 @@ export default function PlannerPage() {
         </div>
       </nav>
 
-      {/* Main Content */}
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
+      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary-900/30 text-primary-300 border border-primary-700/30 px-4 py-2 rounded-full mb-6">
-            <Search className="w-4 h-4" />
+            <Search className="w-4 h-4" aria-hidden="true" />
             <span className="text-sm font-medium">Smart Trip Planning</span>
           </div>
           <h1 className="text-4xl md:text-5xl font-bold mb-4 text-dark-50">
@@ -76,35 +75,34 @@ export default function PlannerPage() {
         </div>
 
         {/* Trip Input Form */}
-        <div className="bg-dark-800 rounded-2xl shadow-xl border border-dark-700 p-8 mb-8">
+        <div className="bg-dark-800/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 p-8 mb-8">
           <TripInputForm onSubmit={handleSearch} isLoading={isSearching} />
         </div>
 
-        {/* Info Cards */}
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-sm">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-sm">
             <div className="text-3xl mb-2">🎯</div>
-            <h3 className="font-semibold mb-2 text-dark-50">Personalized Results</h3>
-            <p className="text-sm text-dark-300">
+            <h3 className="font-semibold mb-2 text-white">Personalized Results</h3>
+            <p className="text-sm text-dark-200">
               Get recommendations tailored to your specific needs and preferences
             </p>
           </div>
-          <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-sm">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-sm">
             <div className="text-3xl mb-2">💰</div>
-            <h3 className="font-semibold mb-2 text-dark-50">Price Intelligence</h3>
-            <p className="text-sm text-dark-300">
+            <h3 className="font-semibold mb-2 text-white">Price Intelligence</h3>
+            <p className="text-sm text-dark-200">
               See if you&apos;re getting a good deal with our AI price analysis
             </p>
           </div>
-          <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-sm">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-sm">
             <div className="text-3xl mb-2">⚡</div>
-            <h3 className="font-semibold mb-2 text-dark-50">Instant Insights</h3>
-            <p className="text-sm text-dark-300">
+            <h3 className="font-semibold mb-2 text-white">Instant Insights</h3>
+            <p className="text-sm text-dark-200">
               Understand why each option is worth considering or avoiding
             </p>
           </div>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

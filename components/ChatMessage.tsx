@@ -21,8 +21,8 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
         <div
           className={`max-w-[80%] rounded-2xl px-4 py-3 ${
             isAssistant
-              ? 'bg-dark-800 text-dark-100 border border-dark-700'
-              : 'bg-primary-600 text-white'
+              ? 'bg-dark-800/70 text-dark-100 border border-white/10 backdrop-blur-sm'
+              : 'bg-primary-700 text-white'
           }`}
         >
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{message.content}</p>
@@ -58,7 +58,7 @@ export default function ChatMessage({ message, onQuickReply }: ChatMessageProps)
             <button
               key={index}
               onClick={() => onQuickReply(reply)}
-              className="px-4 py-2 bg-dark-800 hover:bg-primary-900/40 border border-dark-700 hover:border-primary-700/50 text-dark-200 hover:text-primary-300 rounded-full text-sm transition"
+              className="px-4 py-2 bg-dark-800/60 hover:bg-primary-900/40 border border-white/10 hover:border-primary-700/50 text-dark-200 hover:text-primary-300 rounded-full text-sm transition backdrop-blur-sm"
             >
               {reply.label}
             </button>

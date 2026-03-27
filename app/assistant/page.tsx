@@ -366,18 +366,19 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex flex-col">
-      {/* Header */}
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50">
+    <div className="relative min-h-screen scenic-bg flex flex-col">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
                 <ArrowLeft className="w-5 h-5 text-dark-400 hover:text-dark-200 transition" />
               </Link>
               <div className="flex items-center gap-2">
-                <Plane className="w-8 h-8 text-primary-600" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+                <Plane className="w-8 h-8 text-primary-500" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                   Roamly AI
                 </span>
               </div>
@@ -385,7 +386,7 @@ export default function AIAssistantPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsConstraintPanelOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-dark-700 bg-dark-800/90 px-3 py-1.5 text-xs text-dark-200 hover:text-dark-50 transition"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-dark-800/50 backdrop-blur-sm px-3 py-1.5 text-xs text-white hover:text-white/80 transition"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Trip details
@@ -413,8 +414,7 @@ export default function AIAssistantPage() {
         </div>
       </nav>
 
-      {/* Main Content - Chat First */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
         <div className="max-w-4xl h-full mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <ChatPanel
             messages={messages}
@@ -422,13 +422,13 @@ export default function AIAssistantPage() {
             onQuickReply={handleQuickReply}
           />
         </div>
-      </div>
+      </main>
 
-      <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-sm px-4 sm:px-6 py-3">
+      <div className="relative z-10 border-t border-white/10 bg-dark-900/70 backdrop-blur-sm px-4 sm:px-6 py-3">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <button
             onClick={() => setIsConstraintPanelOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-dark-700 bg-dark-800/80 px-4 py-2.5 text-sm text-dark-100 hover:bg-dark-800 transition"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-dark-800/50 backdrop-blur-sm px-4 py-2.5 text-sm text-white hover:bg-dark-800/70 transition"
           >
             <SlidersHorizontal className="w-4 h-4 text-primary-400" />
             Trip details
@@ -457,8 +457,8 @@ export default function AIAssistantPage() {
             className="absolute inset-0 bg-black/60"
             aria-label="Close trip details panel"
           />
-          <div className="relative w-full sm:max-w-lg bg-dark-900 border border-dark-800 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-hidden animate-sheet-enter">
-            <div className="px-4 py-3 border-b border-dark-800 flex items-center justify-between">
+          <div className="relative w-full sm:max-w-lg bg-dark-900/90 backdrop-blur-xl border border-white/10 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-hidden animate-sheet-enter">
+            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-semibold text-dark-100">Trip details</h3>
                 <p className="text-xs text-dark-400">Open only when you need it</p>
@@ -477,7 +477,7 @@ export default function AIAssistantPage() {
                 onRemoveConstraint={handleRemoveConstraint}
               />
             </div>
-            <div className="border-t border-dark-800 p-3">
+            <div className="border-t border-white/10 p-3">
               <RecommendationTrigger
                 constraints={constraints}
                 onGenerateRecommendations={handleGenerateRecommendations}

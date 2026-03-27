@@ -13,28 +13,29 @@ export default function DashboardPage() {
   const savedTrips: Array<never> = []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      {/* Navigation */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
+    <div className="relative min-h-screen scenic-bg">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+              <Plane className="w-8 h-8 text-primary-500" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                 Roamly
               </span>
             </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-dark-300 hover:text-dark-50 transition">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="text-dark-300 hover:text-dark-50 transition py-2 px-2">
                 Home
               </Link>
-              <Link href="/planner" className="text-dark-300 hover:text-dark-50 transition">
+              <Link href="/planner" className="text-dark-300 hover:text-dark-50 transition py-2 px-2">
                 Plan Trip
               </Link>
-              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
+              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition py-2 px-2">
                 My Watches
               </Link>
-              <Link href="/dashboard" className="text-primary-400 font-medium">
+              <Link href="/dashboard" className="text-primary-400 font-medium py-2 px-2" aria-current="page">
                 Dashboard
               </Link>
             </div>
@@ -42,8 +43,7 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">Your Travel Dashboard</h1>
           <p className="text-lg text-dark-300">Track your trips and savings</p>
@@ -52,10 +52,10 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           {/* Total Trips */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-primary-900/30 p-3 rounded-lg">
-                <Plane className="w-6 h-6 text-primary-600" />
+                <Plane className="w-6 h-6 text-primary-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">{stats.totalTripsPlanned}</div>
@@ -69,10 +69,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Total Saved */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-green-900/30 p-3 rounded-lg">
-                <DollarSign className="w-6 h-6 text-green-600" />
+                <DollarSign className="w-6 h-6 text-green-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">${stats.totalSaved}</div>
@@ -85,10 +85,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Average Score */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-blue-900/30 p-3 rounded-lg">
-                <Award className="w-6 h-6 text-blue-600" />
+                <Award className="w-6 h-6 text-blue-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">{stats.averageScore}</div>
@@ -101,10 +101,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-purple-900/30 p-3 rounded-lg">
-                <Clock className="w-6 h-6 text-purple-600" />
+                <Clock className="w-6 h-6 text-purple-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">{stats.recentSearches.length}</div>
@@ -123,7 +123,7 @@ export default function DashboardPage() {
             <h2 className="text-2xl font-bold text-dark-50">Your Saved Trips</h2>
             <Link
               href="/planner"
-              className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition"
+              className="flex items-center gap-2 bg-primary-700 text-white px-4 py-2 rounded-lg hover:bg-primary-800 transition"
             >
               <Plus className="w-4 h-4" />
               New Trip
@@ -131,7 +131,7 @@ export default function DashboardPage() {
           </div>
 
           {savedTrips.length === 0 && (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-8 text-center text-dark-300">
+            <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-8 text-center text-dark-200">
               No saved trips yet. Start a search to create your first trip.
             </div>
           )}
@@ -141,7 +141,7 @@ export default function DashboardPage() {
         <div>
           <h2 className="text-2xl font-bold text-dark-50 mb-6">Recent Searches</h2>
           {stats.recentSearches.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 text-dark-300">
+            <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-dark-200">
               No recent searches yet.
             </div>
           ) : null}
@@ -150,18 +150,18 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="mt-12 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl p-8 text-white">
           <h3 className="text-2xl font-bold mb-4">Ready for your next adventure?</h3>
-          <p className="mb-6 opacity-90">
+          <p className="mb-6 text-white">
             Start planning your next trip and let our AI find the best options for you
           </p>
           <Link
             href="/planner"
-            className="inline-flex items-center gap-2 bg-dark-700 text-primary-300 border border-primary-700/50 px-6 py-3 rounded-lg hover:bg-dark-600 transition font-semibold"
+            className="inline-flex items-center gap-2 bg-white text-primary-700 px-6 py-3 rounded-lg hover:bg-white/90 transition font-semibold"
           >
             Plan New Trip
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   )
 }

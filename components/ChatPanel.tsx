@@ -45,9 +45,9 @@ export default function ChatPanel({ messages, onSendMessage, onQuickReply }: Cha
   }
 
   return (
-    <div className="flex flex-col h-full min-h-0 rounded-3xl border border-dark-800 bg-gradient-to-b from-dark-900/95 to-dark-950 shadow-[0_20px_55px_-35px_rgba(56,189,248,0.45)] overflow-hidden">
+    <div className="flex flex-col h-full min-h-0 rounded-3xl border border-white/10 bg-dark-900/60 backdrop-blur-xl shadow-[0_20px_55px_-35px_rgba(56,189,248,0.25)] overflow-hidden">
       {/* Header */}
-      <div className="border-b border-dark-800 px-5 py-4 sm:px-6">
+      <div className="border-b border-white/10 px-5 py-4 sm:px-6">
         <div className="flex items-center justify-between gap-4 mb-1">
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-primary-400" />
@@ -88,7 +88,7 @@ export default function ChatPanel({ messages, onSendMessage, onQuickReply }: Cha
       </div>
 
       {/* Input */}
-      <div className="border-t border-dark-800 px-5 py-4 sm:px-6">
+      <div className="border-t border-white/10 px-5 py-4 sm:px-6">
         <form onSubmit={handleSubmit} className="flex gap-2">
           <textarea
             ref={textareaRef}
@@ -96,13 +96,15 @@ export default function ChatPanel({ messages, onSendMessage, onQuickReply }: Cha
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="e.g., I want to fly from NYC to Tokyo next month..."
-            className="flex-1 bg-dark-900 border border-dark-700 rounded-xl px-4 py-3 text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-600 resize-none min-h-[50px] max-h-[120px]"
+            aria-label="Type your travel request"
+            className="flex-1 bg-dark-900/70 border border-white/10 rounded-xl px-4 py-3 text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-600 resize-none min-h-[50px] max-h-[120px]"
             rows={1}
           />
           <button
             type="submit"
             disabled={!input.trim()}
-            className="bg-primary-600 hover:bg-primary-700 disabled:bg-dark-800 disabled:text-dark-600 text-white px-4 py-3 rounded-xl transition flex items-center justify-center"
+            aria-label="Send message"
+            className="bg-primary-700 hover:bg-primary-800 disabled:bg-dark-800 disabled:text-dark-600 text-white px-4 py-3 rounded-xl transition flex items-center justify-center"
           >
             <Send className="w-5 h-5" />
           </button>

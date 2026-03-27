@@ -181,7 +181,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
             className={`flex-1 py-3 px-4 rounded-lg border-2 transition ${
               formData.tripType === 'round-trip'
                 ? 'border-primary-600 bg-primary-900/30 text-primary-300'
-                : 'border-dark-600 hover:border-dark-500'
+                : 'border-white/15 hover:border-white/25 text-white'
             }`}
           >
             Round Trip
@@ -196,7 +196,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
             className={`flex-1 py-3 px-4 rounded-lg border-2 transition ${
               formData.tripType === 'one-way'
                 ? 'border-primary-600 bg-primary-900/30 text-primary-300'
-                : 'border-dark-600 hover:border-dark-500'
+                : 'border-white/15 hover:border-white/25 text-white'
             }`}
           >
             One Way
@@ -207,11 +207,12 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
       {/* Origin and Destination */}
       <div className="grid md:grid-cols-2 gap-6">
         <div>
-          <label className="block text-sm font-medium text-dark-200 mb-2">
-            <MapPin className="inline w-4 h-4 mr-1" />
+          <label htmlFor="origin-input" className="block text-sm font-medium text-dark-200 mb-2">
+            <MapPin className="inline w-4 h-4 mr-1" aria-hidden="true" />
             From (Origin)
           </label>
           <input
+            id="origin-input"
             type="text"
             required
             placeholder="e.g., SFO, San Francisco"
@@ -221,23 +222,24 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
               setErrors(prev => ({ ...prev, origin: undefined }))
             }}
             data-error={errors.origin ? 'true' : 'false'}
-            className={`w-full px-4 py-3 bg-dark-800 text-dark-100 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
-              errors.origin ? 'border-red-500' : 'border-dark-600 focus:border-primary-500'
+            className={`w-full px-4 py-3 bg-dark-900/50 text-white border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
+              errors.origin ? 'border-red-500' : 'border-white/15 focus:border-primary-500'
             }`}
           />
           {errors.origin && (
-            <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span>{errors.origin}</span>
             </div>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-dark-200 mb-2">
-            <MapPin className="inline w-4 h-4 mr-1" />
+          <label htmlFor="destination-input" className="block text-sm font-medium text-dark-200 mb-2">
+            <MapPin className="inline w-4 h-4 mr-1" aria-hidden="true" />
             To (Destination)
           </label>
           <input
+            id="destination-input"
             type="text"
             required
             placeholder="e.g., JFK, New York"
@@ -247,13 +249,13 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
               setErrors(prev => ({ ...prev, destination: undefined }))
             }}
             data-error={errors.destination ? 'true' : 'false'}
-            className={`w-full px-4 py-3 bg-dark-800 text-dark-100 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
-              errors.destination ? 'border-red-500' : 'border-dark-600 focus:border-primary-500'
+            className={`w-full px-4 py-3 bg-dark-900/50 text-white border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
+              errors.destination ? 'border-red-500' : 'border-white/15 focus:border-primary-500'
             }`}
           />
           {errors.destination && (
-            <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span>{errors.destination}</span>
             </div>
           )}
@@ -264,11 +266,12 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
       <div className="space-y-4">
         <div className="grid md:grid-cols-2 gap-6">
           <div>
-            <label className="block text-sm font-medium text-dark-200 mb-2">
-              <Calendar className="inline w-4 h-4 mr-1" />
+            <label htmlFor="departure-date" className="block text-sm font-medium text-dark-200 mb-2">
+              <Calendar className="inline w-4 h-4 mr-1" aria-hidden="true" />
               Departure Date
             </label>
             <input
+              id="departure-date"
               type="date"
               required
               min={getMinDate()}
@@ -278,24 +281,25 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                 setErrors(prev => ({ ...prev, departureDate: undefined }))
               }}
               data-error={errors.departureDate ? 'true' : 'false'}
-              className={`w-full px-4 py-3 bg-dark-800 text-dark-100 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
-                errors.departureDate ? 'border-red-500' : 'border-dark-600 focus:border-primary-500'
+              className={`w-full px-4 py-3 bg-dark-900/50 text-white border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
+                errors.departureDate ? 'border-red-500' : 'border-white/15 focus:border-primary-500'
               }`}
             />
             {errors.departureDate && (
-              <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+                <AlertCircle className="w-4 h-4" aria-hidden="true" />
                 <span>{errors.departureDate}</span>
               </div>
             )}
           </div>
           {formData.tripType === 'round-trip' && (
             <div>
-              <label className="block text-sm font-medium text-dark-200 mb-2">
-                <Calendar className="inline w-4 h-4 mr-1" />
+              <label htmlFor="return-date" className="block text-sm font-medium text-dark-200 mb-2">
+                <Calendar className="inline w-4 h-4 mr-1" aria-hidden="true" />
                 Return Date
               </label>
               <input
+                id="return-date"
                 type="date"
                 required={formData.tripType === 'round-trip'}
                 min={formData.departureDate || getMinDate()}
@@ -305,13 +309,13 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                   setErrors(prev => ({ ...prev, returnDate: undefined }))
                 }}
                 data-error={errors.returnDate ? 'true' : 'false'}
-                className={`w-full px-4 py-3 bg-dark-800 text-dark-100 border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
-                  errors.returnDate ? 'border-red-500' : 'border-dark-600 focus:border-primary-500'
+                className={`w-full px-4 py-3 bg-dark-900/50 text-white border rounded-lg focus:ring-2 focus:ring-primary-500 outline-none transition ${
+                  errors.returnDate ? 'border-red-500' : 'border-white/15 focus:border-primary-500'
                 }`}
               />
               {errors.returnDate && (
-                <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-                  <AlertCircle className="w-4 h-4" />
+                <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+                  <AlertCircle className="w-4 h-4" aria-hidden="true" />
                   <span>{errors.returnDate}</span>
                 </div>
               )}
@@ -346,36 +350,39 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
         </label>
         <div className="grid grid-cols-3 gap-4">
           <div>
-            <label className="block text-xs text-dark-300 mb-1">Adults (12+)</label>
+            <label htmlFor="adults-count" className="block text-xs text-dark-300 mb-1">Adults (12+)</label>
             <input
+              id="adults-count"
               type="number"
               min="1"
               max="9"
               value={formData.passengers.adults}
               onChange={(e) => updateNestedField('passengers', 'adults', parseInt(e.target.value))}
-              className="w-full px-3 py-2 bg-dark-800 text-dark-100 border border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full px-3 py-3 bg-dark-900/50 text-white border border-white/15 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
           <div>
-            <label className="block text-xs text-dark-300 mb-1">Children (2-11)</label>
+            <label htmlFor="children-count" className="block text-xs text-dark-300 mb-1">Children (2-11)</label>
             <input
+              id="children-count"
               type="number"
               min="0"
               max="9"
               value={formData.passengers.children}
               onChange={(e) => updateNestedField('passengers', 'children', parseInt(e.target.value))}
-              className="w-full px-3 py-2 bg-dark-800 text-dark-100 border border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full px-3 py-3 bg-dark-900/50 text-white border border-white/15 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
           <div>
-            <label className="block text-xs text-dark-300 mb-1">Infants (0-2)</label>
+            <label htmlFor="infants-count" className="block text-xs text-dark-300 mb-1">Infants (0-2)</label>
             <input
+              id="infants-count"
               type="number"
               min="0"
               max="9"
               value={formData.passengers.infants}
               onChange={(e) => updateNestedField('passengers', 'infants', parseInt(e.target.value))}
-              className="w-full px-3 py-2 bg-dark-800 text-dark-100 border border-dark-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+              className="w-full px-3 py-3 bg-dark-900/50 text-white border border-white/15 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
             />
           </div>
         </div>
@@ -383,13 +390,14 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
 
       {/* Maximum Budget */}
       <div>
-        <label className="block text-sm font-medium text-dark-200 mb-3">
-          <DollarSign className="inline w-4 h-4 mr-1" />
+        <label htmlFor="budget-range" className="block text-sm font-medium text-dark-200 mb-3">
+          <DollarSign className="inline w-4 h-4 mr-1" aria-hidden="true" />
           Maximum Budget (per person)
         </label>
         <div className="space-y-2">
           <div className="flex items-center gap-4">
             <input
+              id="budget-range"
               type="range"
               min="50"
               max="5000"
@@ -399,15 +407,15 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                 updateField('maxBudget', parseInt(e.target.value))
                 setErrors(prev => ({ ...prev, maxBudget: undefined }))
               }}
-              className="flex-1 h-2 bg-dark-700 rounded-lg appearance-none cursor-pointer accent-primary-600"
+              className="flex-1 h-2 bg-white/20 rounded-lg appearance-none cursor-pointer accent-primary-500"
             />
             <div className="text-2xl font-bold text-primary-400 min-w-[120px] text-right">
               ${formData.maxBudget}
             </div>
           </div>
           {errors.maxBudget && (
-            <div className="flex items-center gap-1 text-sm text-red-600">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-1 text-sm text-red-400" role="alert">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span>{errors.maxBudget}</span>
             </div>
           )}
@@ -420,9 +428,8 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
         </div>
       </div>
 
-      {/* Preferences */}
-      <div className="border-t pt-8">
-        <h3 className="text-lg font-semibold mb-6 text-dark-50">Travel Preferences</h3>
+      <div className="border-t border-dark-700 pt-8">
+        <h2 className="text-lg font-semibold mb-6 text-dark-50">Travel Preferences</h2>
         
         <div className="space-y-6">
           {/* Cabin Class */}
@@ -445,7 +452,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                   className={`py-3 px-4 rounded-lg border-2 transition text-center ${
                     formData.preferences.cabinClass === cabin.value
                       ? 'border-primary-600 bg-primary-900/30 text-primary-300'
-                      : 'border-dark-600 hover:border-dark-500 text-dark-200'
+                        : 'border-white/15 hover:border-white/25 text-white'
                   }`}
                 >
                   <div className="text-2xl mb-1">{cabin.icon}</div>
@@ -468,7 +475,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                 className={`py-4 px-4 rounded-lg border-2 transition ${
                   !formData.preferences.checkedBag
                     ? 'border-primary-600 bg-primary-900/30 text-primary-300'
-                    : 'border-dark-600 hover:border-dark-500 text-dark-200'
+                    : 'border-white/15 hover:border-white/25 text-white'
                 }`}
               >
                 <div className="text-2xl mb-2">🎒</div>
@@ -481,7 +488,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                 className={`py-4 px-4 rounded-lg border-2 transition ${
                   formData.preferences.checkedBag
                     ? 'border-primary-600 bg-primary-900/30 text-primary-300'
-                    : 'border-dark-600 hover:border-dark-500 text-dark-200'
+                    : 'border-white/15 hover:border-white/25 text-white'
                 }`}
               >
                 <div className="text-2xl mb-2">🧳</div>
@@ -532,7 +539,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                   className={`py-3 px-3 rounded-lg border-2 transition text-center ${
                     formData.preferences.departureTimePreferences.includes(timeSlot.value)
                       ? 'border-primary-600 bg-primary-900/30 text-primary-300'
-                        : 'border-dark-600 hover:border-dark-500 text-dark-200'
+                        : 'border-white/15 hover:border-white/25 text-white'
                   }`}
                 >
                   <div className="text-2xl mb-1">{timeSlot.icon}</div>
@@ -571,12 +578,11 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
         </div>
       </div>
 
-      {/* Submit Button */}
-      <div className="border-t pt-8">
+      <div className="border-t border-dark-700 pt-8">
         <button
           type="submit"
           disabled={isLoading}
-          className="w-full bg-primary-600 text-white py-4 rounded-lg hover:bg-primary-700 transition font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
+          className="w-full bg-primary-700 text-white py-4 rounded-lg hover:bg-primary-800 transition font-semibold text-lg disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg hover:shadow-xl"
         >
           {isLoading ? (
             <>

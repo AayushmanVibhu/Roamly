@@ -95,7 +95,7 @@ export default function RecommendationTrigger({
               className={`px-3 py-2 rounded-md text-sm font-medium ${
                 !hasMinimumInfo || isCreatingWatch
                   ? 'bg-dark-700 text-dark-500 cursor-not-allowed'
-                  : 'bg-primary-600 hover:bg-primary-700 text-white'
+                  : 'bg-primary-700 hover:bg-primary-800 text-white'
               }`}
             >
               {isCreatingWatch ? 'Saving...' : 'Create Watch'}
