@@ -97,12 +97,12 @@ export default function WatchesPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+              <Plane className="w-8 h-8 text-primary-500" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                 Roamly
               </span>
             </Link>
@@ -118,7 +118,7 @@ export default function WatchesPage() {
         </div>
       </nav>
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">My Watches</h1>
           <p className="text-dark-300">
@@ -133,6 +133,7 @@ export default function WatchesPage() {
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter email used for watch alerts"
+              aria-label="Email used for watch alerts"
               className="flex-1 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
             />
             <button
@@ -144,7 +145,7 @@ export default function WatchesPage() {
               {isLoading ? 'Loading...' : 'Load Watches'}
             </button>
           </div>
-          <div className="flex flex-wrap gap-2 mt-3">
+          <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Filter watches by status">
             {(['all', 'active', 'paused', 'matched', 'cancelled'] as WatchFilter[]).map(status => (
               <button
                 key={status}
@@ -152,7 +153,8 @@ export default function WatchesPage() {
                   setFilter(status)
                   void loadWatches(email, status)
                 }}
-                className={`px-3 py-1 rounded-full text-xs border ${
+                aria-pressed={filter === status}
+                className={`px-3 py-1 rounded-full text-xs border capitalize ${
                   filter === status
                     ? 'bg-primary-900/30 text-primary-300 border-primary-700/40'
                     : 'bg-dark-900 text-dark-300 border-dark-700'
@@ -165,7 +167,7 @@ export default function WatchesPage() {
         </div>
 
         {statusMessage && (
-          <div className="mb-4 bg-primary-900/20 border border-primary-700/30 text-primary-300 rounded-lg p-3 text-sm">
+          <div className="mb-4 bg-primary-900/20 border border-primary-700/30 text-primary-300 rounded-lg p-3 text-sm" role="status">
             {statusMessage}
           </div>
         )}
@@ -248,7 +250,7 @@ export default function WatchesPage() {
             ))
           )}
         </div>
-      </div>
+      </main>
     </div>
   )
 }

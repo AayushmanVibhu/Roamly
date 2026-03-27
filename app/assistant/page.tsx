@@ -367,17 +367,16 @@ export default function AIAssistantPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex flex-col">
-      {/* Header */}
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50">
+      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
-              <Link href="/" className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2" aria-label="Back to home">
                 <ArrowLeft className="w-5 h-5 text-dark-400 hover:text-dark-200 transition" />
               </Link>
               <div className="flex items-center gap-2">
-                <Plane className="w-8 h-8 text-primary-600" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+                <Plane className="w-8 h-8 text-primary-500" />
+                <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                   Roamly AI
                 </span>
               </div>
@@ -413,8 +412,7 @@ export default function AIAssistantPage() {
         </div>
       </nav>
 
-      {/* Main Content - Chat First */}
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <main className="flex-1 min-h-0 overflow-hidden">
         <div className="max-w-4xl h-full mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <ChatPanel
             messages={messages}
@@ -422,7 +420,7 @@ export default function AIAssistantPage() {
             onQuickReply={handleQuickReply}
           />
         </div>
-      </div>
+      </main>
 
       <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-sm px-4 sm:px-6 py-3">
         <div className="max-w-4xl mx-auto flex items-center gap-3">

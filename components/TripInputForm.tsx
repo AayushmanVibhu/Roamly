@@ -226,8 +226,8 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
             }`}
           />
           {errors.origin && (
-            <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span>{errors.origin}</span>
             </div>
           )}
@@ -252,8 +252,8 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
             }`}
           />
           {errors.destination && (
-            <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span>{errors.destination}</span>
             </div>
           )}
@@ -283,8 +283,8 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
               }`}
             />
             {errors.departureDate && (
-              <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-                <AlertCircle className="w-4 h-4" />
+              <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+                <AlertCircle className="w-4 h-4" aria-hidden="true" />
                 <span>{errors.departureDate}</span>
               </div>
             )}
@@ -310,8 +310,8 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
                 }`}
               />
               {errors.returnDate && (
-                <div className="flex items-center gap-1 mt-1 text-sm text-red-600">
-                  <AlertCircle className="w-4 h-4" />
+                <div className="flex items-center gap-1 mt-1 text-sm text-red-400" role="alert">
+                  <AlertCircle className="w-4 h-4" aria-hidden="true" />
                   <span>{errors.returnDate}</span>
                 </div>
               )}
@@ -406,8 +406,8 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
             </div>
           </div>
           {errors.maxBudget && (
-            <div className="flex items-center gap-1 text-sm text-red-600">
-              <AlertCircle className="w-4 h-4" />
+            <div className="flex items-center gap-1 text-sm text-red-400" role="alert">
+              <AlertCircle className="w-4 h-4" aria-hidden="true" />
               <span>{errors.maxBudget}</span>
             </div>
           )}
@@ -420,8 +420,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
         </div>
       </div>
 
-      {/* Preferences */}
-      <div className="border-t pt-8">
+      <div className="border-t border-dark-700 pt-8">
         <h3 className="text-lg font-semibold mb-6 text-dark-50">Travel Preferences</h3>
         
         <div className="space-y-6">
@@ -571,8 +570,7 @@ export default function TripInputForm({ onSubmit, isLoading = false }: TripInput
         </div>
       </div>
 
-      {/* Submit Button */}
-      <div className="border-t pt-8">
+      <div className="border-t border-dark-700 pt-8">
         <button
           type="submit"
           disabled={isLoading}

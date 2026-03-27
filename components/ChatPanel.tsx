@@ -96,12 +96,14 @@ export default function ChatPanel({ messages, onSendMessage, onQuickReply }: Cha
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="e.g., I want to fly from NYC to Tokyo next month..."
+            aria-label="Type your travel request"
             className="flex-1 bg-dark-900 border border-dark-700 rounded-xl px-4 py-3 text-dark-100 placeholder-dark-500 focus:outline-none focus:ring-2 focus:ring-primary-600 resize-none min-h-[50px] max-h-[120px]"
             rows={1}
           />
           <button
             type="submit"
             disabled={!input.trim()}
+            aria-label="Send message"
             className="bg-primary-600 hover:bg-primary-700 disabled:bg-dark-800 disabled:text-dark-600 text-white px-4 py-3 rounded-xl transition flex items-center justify-center"
           >
             <Send className="w-5 h-5" />

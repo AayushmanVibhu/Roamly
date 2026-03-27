@@ -14,13 +14,12 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      {/* Navigation */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
+      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
+              <Plane className="w-8 h-8 text-primary-500" />
+              <span className="text-2xl font-bold bg-gradient-to-r from-primary-400 to-purple-400 bg-clip-text text-transparent">
                 Roamly
               </span>
             </Link>
@@ -34,7 +33,7 @@ export default function DashboardPage() {
               <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
                 My Watches
               </Link>
-              <Link href="/dashboard" className="text-primary-400 font-medium">
+              <Link href="/dashboard" className="text-primary-400 font-medium" aria-current="page">
                 Dashboard
               </Link>
             </div>
@@ -42,8 +41,7 @@ export default function DashboardPage() {
         </div>
       </nav>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">Your Travel Dashboard</h1>
           <p className="text-lg text-dark-300">Track your trips and savings</p>
@@ -150,18 +148,18 @@ export default function DashboardPage() {
         {/* Quick Actions */}
         <div className="mt-12 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl p-8 text-white">
           <h3 className="text-2xl font-bold mb-4">Ready for your next adventure?</h3>
-          <p className="mb-6 opacity-90">
+          <p className="mb-6 text-white">
             Start planning your next trip and let our AI find the best options for you
           </p>
           <Link
             href="/planner"
-            className="inline-flex items-center gap-2 bg-dark-700 text-primary-300 border border-primary-700/50 px-6 py-3 rounded-lg hover:bg-dark-600 transition font-semibold"
+            className="inline-flex items-center gap-2 bg-white text-primary-700 px-6 py-3 rounded-lg hover:bg-white/90 transition font-semibold"
           >
             Plan New Trip
             <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
-      </div>
+      </main>
     </div>
   )
 }
