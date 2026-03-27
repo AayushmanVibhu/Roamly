@@ -1,277 +1,244 @@
+'use client'
+
+import { FormEvent, useMemo, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowRight, Plane, DollarSign, Clock, Award, Sparkles, CheckCircle } from 'lucide-react'
+import { Plane, Sparkles, ArrowRight, MessageCircle, MapPin, CalendarDays, Luggage } from 'lucide-react'
+import { saveTripPreferences } from '@/lib/tripPreferencesUtils'
+import { TripPreferences } from '@/types'
+
+type InputMode = 'form' | 'chat'
+type BaggagePreference = 'none' | 'carry-on' | 'checked'
 
 export default function Home() {
+  const router = useRouter()
+  const [inputMode, setInputMode] = useState<InputMode>('form')
+  const [from, setFrom] = useState('')
+  const [to, setTo] = useState('')
+  const [departureDate, setDepartureDate] = useState('')
+  const [returnDate, setReturnDate] = useState('')
+  const [baggage, setBaggage] = useState<BaggagePreference>('carry-on')
+  const [chatPrompt, setChatPrompt] = useState('')
+
+  const today = useMemo(() => new Date().toISOString().split('T')[0], [])
+
+  const handleSearch = (event: FormEvent) => {
+    event.preventDefault()
+    if (!from.trim() || !to.trim()) return
+
+    const preferences: TripPreferences = {
+      origin: from.trim(),
+      destination: to.trim(),
+      departureDate: departureDate || today,
+      returnDate: returnDate || undefined,
+      tripType: returnDate ? 'round-trip' : 'one-way',
+      flexibleDates: false,
+      passengers: {
+        adults: 1,
+        children: 0,
+        infants: 0,
+      },
+      maxBudget: 1500,
+      currency: 'USD',
+      preferences: {
+        cabinClass: 'economy',
+        checkedBag: baggage === 'checked',
+        nonstopOnly: false,
+        departureTimePreferences: [],
+        hotelNeeded: false,
+      },
+    }
+
+    saveTripPreferences(preferences)
+    router.push('/results')
+  }
+
+  const handleChatMode = () => {
+    if (chatPrompt.trim()) {
+      sessionStorage.setItem('roamlyChatPrompt', chatPrompt.trim())
+    }
+    router.push('/assistant')
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      {/* Navigation */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                Roamly
-              </span>
-            </div>
-            <div className="hidden md:flex items-center gap-8">
-              <Link href="#features" className="text-dark-300 hover:text-dark-50 transition">
-                Features
+    <div className="min-h-screen bg-dark-950">
+      <section
+        className="relative min-h-screen"
+        style={{
+          backgroundImage:
+            "url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000&q=80')",
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+        }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/55 via-[#7c3aed]/45 to-[#2563eb]/55" />
+        <div className="absolute inset-0 bg-black/30" />
+
+        <nav className="relative z-10 border-b border-white/15 bg-black/20 backdrop-blur-sm">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="h-16 flex items-center justify-between">
+              <Link href="/" className="flex items-center gap-2">
+                <Plane className="w-7 h-7 text-white" />
+                <span className="text-2xl font-bold text-white">Roamly</span>
               </Link>
-              <Link href="#how-it-works" className="text-dark-300 hover:text-dark-50 transition">
-                How It Works
-              </Link>
-              <Link href="/assistant" className="text-dark-300 hover:text-dark-50 transition">
-                AI Assistant
-              </Link>
-              <Link href="/dashboard" className="text-dark-300 hover:text-dark-50 transition">
-                Dashboard
-              </Link>
-              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
-                My Watches
-              </Link>
-              <Link
-                href="/planner"
-                className="bg-primary-600 text-white px-6 py-2 rounded-full hover:bg-primary-700 transition"
-              >
-                Start Planning
-              </Link>
+              <div className="hidden md:flex items-center gap-6 text-white/90 text-sm">
+                <Link href="/results" className="hover:text-white transition">Results</Link>
+                <Link href="/assistant" className="hover:text-white transition">Chat input</Link>
+                <Link href="/watches" className="hover:text-white transition">My Watches</Link>
+              </div>
             </div>
           </div>
-        </div>
-      </nav>
+        </nav>
 
-      {/* Hero Section */}
-      <section className="relative overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 md:py-32">
-          <div className="text-center animate-fade-in">
-            <div className="inline-flex items-center gap-2 bg-primary-900/30 text-primary-300 border border-primary-700/30 px-4 py-2 rounded-full mb-8">
+        <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 md:pt-24 pb-14">
+          <div className="text-center mb-10">
+            <p className="inline-flex items-center gap-2 rounded-full border border-white/35 bg-white/10 px-4 py-1.5 text-sm text-white/95">
               <Sparkles className="w-4 h-4" />
-              <span className="text-sm font-medium">AI-Powered Travel Decisions</span>
-            </div>
-            
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 bg-gradient-to-r from-dark-50 via-primary-400 to-purple-400 bg-clip-text text-transparent">
-              Travel Smarter,
-              <br />
-              Not Harder
+              Plan your next escape
+            </p>
+            <h1 className="mt-6 text-4xl md:text-6xl font-bold text-white text-balance">
+              Where do you want to go?
             </h1>
-            
-            <p className="text-xl md:text-2xl text-dark-300 mb-12 max-w-3xl mx-auto">
-              Stop wasting time comparing flights. Let Roamly find the best travel options 
-              based on your budget, preferences, and what matters most to you.
+            <p className="mt-4 text-lg md:text-2xl text-white/90 max-w-3xl mx-auto text-balance">
+              We&apos;ll help you figure out the best way to get there
             </p>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center relative z-10">
-              <Link
-                href="/assistant"
-                className="group bg-gradient-to-r from-primary-600 to-purple-600 text-white px-8 py-4 rounded-full hover:from-primary-700 hover:to-purple-700 transition flex items-center gap-2 text-lg font-semibold shadow-lg hover:shadow-xl"
+          </div>
+
+          <div className="max-w-4xl mx-auto rounded-3xl bg-white/92 backdrop-blur-md shadow-[0_25px_80px_-35px_rgba(0,0,0,0.65)] border border-white/65 p-5 md:p-7">
+            <div className="inline-flex rounded-full border border-slate-200 bg-white p-1 mb-5">
+              <button
+                onClick={() => setInputMode('form')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                  inputMode === 'form'
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
               >
-                <Sparkles className="w-5 h-5" />
-                Try AI Assistant
-                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition" />
-              </Link>
-              <Link
-                href="/planner"
-                className="text-dark-200 px-8 py-4 rounded-full hover:bg-dark-800 transition text-lg font-semibold border border-dark-700"
+                Quick form
+              </button>
+              <button
+                onClick={() => setInputMode('chat')}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                  inputMode === 'chat'
+                    ? 'bg-slate-900 text-white'
+                    : 'text-slate-600 hover:text-slate-900'
+                }`}
               >
-                Classic Form
-              </Link>
+                Chat style input
+              </button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 mt-20 max-w-2xl mx-auto">
-              <div>
-                <div className="text-4xl font-bold text-primary-400">85%</div>
-                <div className="text-sm text-dark-400 mt-1">Time Saved</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary-400">$340</div>
-                <div className="text-sm text-dark-400 mt-1">Avg. Savings</div>
-              </div>
-              <div>
-                <div className="text-4xl font-bold text-primary-400">4.9★</div>
-                <div className="text-sm text-dark-400 mt-1">User Rating</div>
-              </div>
-            </div>
-          </div>
-        </div>
+            {inputMode === 'form' ? (
+              <form onSubmit={handleSearch} className="space-y-4">
+                <div className="grid md:grid-cols-2 gap-3">
+                  <label className="rounded-2xl border border-slate-200 px-4 py-3 bg-white">
+                    <span className="text-xs text-slate-500 uppercase tracking-wide">From</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <MapPin className="w-4 h-4 text-slate-400" />
+                      <input
+                        value={from}
+                        onChange={e => setFrom(e.target.value)}
+                        placeholder="City or airport"
+                        className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none"
+                        required
+                      />
+                    </div>
+                  </label>
 
-        {/* Decorative Elements */}
-        <div className="absolute top-20 left-10 w-72 h-72 bg-purple-900/30 rounded-full filter blur-xl opacity-50 animate-pulse pointer-events-none"></div>
-        <div className="absolute bottom-20 right-10 w-72 h-72 bg-blue-900/30 rounded-full filter blur-xl opacity-50 animate-pulse pointer-events-none"></div>
-      </section>
+                  <label className="rounded-2xl border border-slate-200 px-4 py-3 bg-white">
+                    <span className="text-xs text-slate-500 uppercase tracking-wide">To</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Plane className="w-4 h-4 text-slate-400" />
+                      <input
+                        value={to}
+                        onChange={e => setTo(e.target.value)}
+                        placeholder="Destination"
+                        className="w-full bg-transparent text-slate-900 placeholder:text-slate-400 outline-none"
+                        required
+                      />
+                    </div>
+                  </label>
+                </div>
 
-      {/* Features Section */}
-      <section id="features" className="py-20 bg-dark-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-dark-50">
-              Why Choose Roamly?
-            </h2>
-            <p className="text-xl text-dark-300">
-              We don&apos;t just show you flights—we help you make the right decision
-            </p>
-          </div>
+                <div className="grid md:grid-cols-3 gap-3">
+                  <label className="rounded-2xl border border-slate-200 px-4 py-3 bg-white">
+                    <span className="text-xs text-slate-500 uppercase tracking-wide">Departure</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <CalendarDays className="w-4 h-4 text-slate-400" />
+                      <input
+                        type="date"
+                        value={departureDate}
+                        onChange={e => setDepartureDate(e.target.value)}
+                        min={today}
+                        className="w-full bg-transparent text-slate-900 outline-none"
+                      />
+                    </div>
+                  </label>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-            {/* Feature 1 */}
-            <div className="bg-gradient-to-br from-dark-800 to-dark-750 p-8 rounded-2xl hover:shadow-xl hover:shadow-primary-900/20 transition border border-dark-700">
-              <div className="bg-primary-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <DollarSign className="w-6 h-6 text-white" />
+                  <label className="rounded-2xl border border-slate-200 px-4 py-3 bg-white">
+                    <span className="text-xs text-slate-500 uppercase tracking-wide">Return</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <CalendarDays className="w-4 h-4 text-slate-400" />
+                      <input
+                        type="date"
+                        value={returnDate}
+                        onChange={e => setReturnDate(e.target.value)}
+                        min={departureDate || today}
+                        className="w-full bg-transparent text-slate-900 outline-none"
+                      />
+                    </div>
+                  </label>
+
+                  <label className="rounded-2xl border border-slate-200 px-4 py-3 bg-white">
+                    <span className="text-xs text-slate-500 uppercase tracking-wide">Baggage</span>
+                    <div className="flex items-center gap-2 mt-1">
+                      <Luggage className="w-4 h-4 text-slate-400" />
+                      <select
+                        value={baggage}
+                        onChange={e => setBaggage(e.target.value as BaggagePreference)}
+                        className="w-full bg-transparent text-slate-900 outline-none"
+                      >
+                        <option value="none">None</option>
+                        <option value="carry-on">Carry-on</option>
+                        <option value="checked">Checked</option>
+                      </select>
+                    </div>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  className="w-full md:w-auto inline-flex items-center justify-center gap-2 rounded-2xl bg-slate-900 hover:bg-slate-800 px-8 py-3 text-white font-semibold transition shadow-md"
+                >
+                  Search
+                  <ArrowRight className="w-4 h-4" />
+                </button>
+              </form>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-slate-600 text-sm">
+                  Keep it simple. Tell us your trip in one sentence and continue in chat.
+                </p>
+                <div className="rounded-2xl border border-slate-200 bg-white p-3">
+                  <textarea
+                    value={chatPrompt}
+                    onChange={e => setChatPrompt(e.target.value)}
+                    placeholder="Example: I want to fly from Phoenix to New York under $350 with one checked bag."
+                    className="w-full h-24 resize-none bg-transparent text-slate-900 placeholder:text-slate-400 outline-none"
+                  />
+                </div>
+                <button
+                  onClick={handleChatMode}
+                  className="inline-flex items-center gap-2 rounded-2xl bg-slate-900 hover:bg-slate-800 px-6 py-3 text-white font-semibold transition"
+                >
+                  <MessageCircle className="w-4 h-4" />
+                  Continue in chat
+                </button>
               </div>
-              <h3 className="text-xl font-bold mb-2 text-dark-50">Smart Pricing</h3>
-              <p className="text-dark-300">
-                Know if you&apos;re getting a good deal with price analysis and trend predictions
-              </p>
-            </div>
-
-            {/* Feature 2 */}
-            <div className="bg-gradient-to-br from-dark-800 to-dark-750 p-8 rounded-2xl hover:shadow-xl hover:shadow-purple-900/20 transition border border-dark-700">
-              <div className="bg-purple-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Clock className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2 text-dark-50">Time Optimizer</h3>
-              <p className="text-dark-300">
-                Factor in layovers, delays, and total travel time for real convenience
-              </p>
-            </div>
-
-            {/* Feature 3 */}
-            <div className="bg-gradient-to-br from-dark-800 to-dark-750 p-8 rounded-2xl hover:shadow-xl hover:shadow-green-900/20 transition border border-dark-700">
-              <div className="bg-green-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Award className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2 text-dark-50">Quality Score</h3>
-              <p className="text-dark-300">
-                See overall value scores based on price, comfort, schedule, and reliability
-              </p>
-            </div>
-
-            {/* Feature 4 */}
-            <div className="bg-gradient-to-br from-dark-800 to-dark-750 p-8 rounded-2xl hover:shadow-xl hover:shadow-orange-900/20 transition border border-dark-700">
-              <div className="bg-orange-600 w-12 h-12 rounded-lg flex items-center justify-center mb-4">
-                <Sparkles className="w-6 h-6 text-white" />
-              </div>
-              <h3 className="text-xl font-bold mb-2 text-dark-50">AI Insights</h3>
-              <p className="text-dark-300">
-                Get personalized recommendations based on your preferences and constraints
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works Section */}
-      <section id="how-it-works" className="py-20 bg-gradient-to-br from-dark-950 to-dark-900">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4 text-dark-50">
-              How It Works
-            </h2>
-            <p className="text-xl text-dark-300">
-              Three simple steps to smarter travel decisions
-            </p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="bg-primary-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                1
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-dark-50">Tell Us Your Plans</h3>
-              <p className="text-dark-300 text-lg">
-                Enter your destination, dates, budget, and preferences. Be as specific or flexible as you like.
-              </p>
-            </div>
-
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="bg-primary-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                2
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-dark-50">AI Analyzes Options</h3>
-              <p className="text-dark-300 text-lg">
-                Our AI evaluates hundreds of flights, considering price, time, comfort, and your specific needs.
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="bg-primary-600 text-white w-16 h-16 rounded-full flex items-center justify-center text-2xl font-bold mx-auto mb-6">
-                3
-              </div>
-              <h3 className="text-2xl font-bold mb-4 text-dark-50">Get Smart Recommendations</h3>
-              <p className="text-dark-300 text-lg">
-                See the best options ranked by value, with clear explanations of why each is worth considering.
-              </p>
-            </div>
+            )}
           </div>
         </div>
       </section>
-
-      {/* CTA Section */}
-      <section className="py-20 bg-gradient-to-r from-primary-600 to-purple-600 text-white">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
-            Ready to Travel Smarter?
-          </h2>
-          <p className="text-xl mb-8 opacity-90">
-            Join thousands of travelers who&apos;ve stopped stressing over flight searches
-          </p>
-          <Link
-            href="/planner"
-            className="inline-flex items-center gap-2 bg-dark-800 text-primary-300 border border-primary-700/50 px-8 py-4 rounded-full hover:bg-dark-700 transition text-lg font-semibold shadow-lg"
-          >
-            Start Planning for Free
-            <ArrowRight className="w-5 h-5" />
-          </Link>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="bg-dark-950 text-dark-300 py-12 border-t border-dark-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid md:grid-cols-4 gap-8 mb-8">
-            <div>
-              <div className="flex items-center gap-2 mb-4">
-                <Plane className="w-6 h-6 text-primary-400" />
-                <span className="text-xl font-bold text-white">Roamly</span>
-              </div>
-              <p className="text-sm">
-                Making travel decisions simple and intelligent.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Product</h4>
-              <ul className="space-y-2 text-sm">
-                <li><Link href="/planner" className="text-dark-300 hover:text-white transition">Trip Planner</Link></li>
-                <li><Link href="/dashboard" className="text-dark-300 hover:text-white transition">Dashboard</Link></li>
-                <li><Link href="#features" className="text-dark-300 hover:text-white transition">Features</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Company</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-dark-300 hover:text-white transition">About</a></li>
-                <li><a href="#" className="text-dark-300 hover:text-white transition">Blog</a></li>
-                <li><a href="#" className="text-dark-300 hover:text-white transition">Careers</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold text-white mb-4">Legal</h4>
-              <ul className="space-y-2 text-sm">
-                <li><a href="#" className="text-dark-300 hover:text-white transition">Privacy</a></li>
-                <li><a href="#" className="text-dark-300 hover:text-white transition">Terms</a></li>
-                <li><a href="#" className="text-dark-300 hover:text-white transition">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-dark-800 pt-8 text-sm text-center text-dark-400">
-            <p>&copy; 2026 Roamly. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   )
 }
