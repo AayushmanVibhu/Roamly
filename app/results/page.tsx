@@ -187,8 +187,10 @@ export default function ResultsPage() {
 
   if (isLoading) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex items-center justify-center">
-        <div className="text-center text-dark-50" role="status">
+      <main className="relative min-h-screen scenic-bg flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+        <div className="absolute inset-0 bg-dark-950/55" />
+        <div className="relative z-10 text-center text-white" role="status">
           <div className="h-12 w-12 border-4 border-white/40 border-t-white rounded-full animate-spin mx-auto mb-4" />
           <p>Finding beautiful options for your route...</p>
         </div>
@@ -198,10 +200,12 @@ export default function ResultsPage() {
 
   if (!preferences) {
     return (
-      <main className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex items-center justify-center">
-        <div className="text-center max-w-md px-4">
-          <h2 className="text-2xl font-semibold text-dark-50 mb-3">No trip details found</h2>
-          <p className="text-dark-300 mb-6">Start with a route and dates first.</p>
+      <main className="relative min-h-screen scenic-bg flex items-center justify-center">
+        <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+        <div className="absolute inset-0 bg-dark-950/55" />
+        <div className="relative z-10 text-center max-w-md px-4">
+          <h2 className="text-2xl font-semibold text-white mb-3">No trip details found</h2>
+          <p className="text-white/80 mb-6">Start with a route and dates first.</p>
           <Link href="/" className="inline-flex items-center gap-2 rounded-xl bg-primary-700 text-white px-5 py-3 font-medium hover:bg-primary-800 transition">
             Go to search
           </Link>
@@ -211,8 +215,10 @@ export default function ResultsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 text-dark-50">
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-40" aria-label="Main navigation">
+    <div className="relative min-h-screen scenic-bg text-white">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0" aria-label="Main navigation">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
             <Plane className="w-7 h-7 text-primary-500" />
@@ -230,7 +236,7 @@ export default function ResultsPage() {
         </div>
       </nav>
 
-      <main className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
+      <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
         <div className="rounded-3xl border border-dark-700 bg-gradient-to-r from-[#f97316]/15 via-[#7c3aed]/10 to-[#2563eb]/15 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.5)] p-6 md:p-8">
           <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-dark-200 bg-dark-800/70 border border-dark-700 rounded-full px-3 py-1">
             <Sparkles className="w-3.5 h-3.5" />

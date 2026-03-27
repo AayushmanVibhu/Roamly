@@ -96,8 +96,10 @@ export default function WatchesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950">
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
+    <div className="relative min-h-screen scenic-bg">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
@@ -118,7 +120,7 @@ export default function WatchesPage() {
         </div>
       </nav>
 
-      <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">My Watches</h1>
           <p className="text-dark-300">

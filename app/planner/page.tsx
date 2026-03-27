@@ -35,8 +35,10 @@ export default function PlannerPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950">
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
+    <div className="relative min-h-screen scenic-bg">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <Link href="/" className="flex items-center gap-2">
@@ -58,7 +60,7 @@ export default function PlannerPage() {
         </div>
       </nav>
 
-      <main className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <main className="relative z-10 max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="text-center mb-12">
           <div className="inline-flex items-center gap-2 bg-primary-900/30 text-primary-300 border border-primary-700/30 px-4 py-2 rounded-full mb-6">
             <Search className="w-4 h-4" aria-hidden="true" />

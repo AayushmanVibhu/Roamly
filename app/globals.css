@@ -31,6 +31,15 @@
   }
 }
 
+@layer components {
+  .scenic-bg {
+    background-image: url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000&q=80');
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+  }
+}
+
 @layer utilities {
   .text-balance {
     text-wrap: balance;

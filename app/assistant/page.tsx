@@ -366,8 +366,10 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex flex-col">
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
+    <div className="relative min-h-screen scenic-bg flex flex-col">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
+      <nav className="relative z-10 border-b border-white/10 bg-dark-900/50 backdrop-blur-md sticky top-0 z-50" aria-label="Main navigation">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-4">
@@ -412,7 +414,7 @@ export default function AIAssistantPage() {
         </div>
       </nav>
 
-      <main className="flex-1 min-h-0 overflow-hidden">
+      <main className="relative z-10 flex-1 min-h-0 overflow-hidden">
         <div className="max-w-4xl h-full mx-auto px-4 sm:px-6 py-4 sm:py-6">
           <ChatPanel
             messages={messages}
@@ -422,7 +424,7 @@ export default function AIAssistantPage() {
         </div>
       </main>
 
-      <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-sm px-4 sm:px-6 py-3">
+      <div className="relative z-10 border-t border-white/10 bg-dark-900/70 backdrop-blur-sm px-4 sm:px-6 py-3">
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <button
             onClick={() => setIsConstraintPanelOpen(true)}

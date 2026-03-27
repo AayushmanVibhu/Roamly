@@ -61,19 +61,13 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950">
+    <main className="relative min-h-screen scenic-bg">
+      <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
+      <div className="absolute inset-0 bg-dark-950/55" />
       <section
         aria-label="Hero"
         className="relative min-h-screen"
-        style={{
-          backgroundImage:
-            "url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2000&q=80')",
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f97316]/40 via-[#7c3aed]/35 to-[#2563eb]/40" />
-        <div className="absolute inset-0 bg-dark-950/60" />
 
         <nav className="relative z-10 border-b border-dark-800/60 bg-dark-900/50 backdrop-blur-md" aria-label="Main navigation">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -217,7 +211,7 @@ export default function Home() {
               </form>
             ) : (
               <div className="space-y-4">
-                <p className="text-dark-200 text-sm font-medium">
+                <p className="text-white text-sm font-semibold">
                   Keep it simple. Tell us your trip in one sentence and continue in chat.
                 </p>
                 <div className="rounded-2xl border border-dark-700 bg-dark-800 p-3">
