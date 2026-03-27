@@ -128,7 +128,7 @@ export default function WatchesPage() {
           </p>
         </div>
 
-        <div className="bg-dark-800 border border-dark-700 rounded-xl p-4 mb-6">
+        <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-4 mb-6">
           <div className="flex flex-col md:flex-row gap-3">
             <input
               type="email"
@@ -136,7 +136,7 @@ export default function WatchesPage() {
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter email used for watch alerts"
               aria-label="Email used for watch alerts"
-              className="flex-1 px-3 py-3 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
+              className="flex-1 px-3 py-3 rounded-lg bg-dark-900/50 border border-white/10 text-white placeholder-dark-400"
             />
             <button
               onClick={() => loadWatches(email, filter)}
@@ -176,12 +176,12 @@ export default function WatchesPage() {
 
         <div className="space-y-4">
           {filteredWatches.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-8 text-center text-dark-300">
+            <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-8 text-center text-dark-200">
               No watches to show for this filter.
             </div>
           ) : (
             filteredWatches.map(watch => (
-              <div key={watch.id} className="bg-dark-800 border border-dark-700 rounded-xl p-5">
+              <div key={watch.id} className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-5">
                 <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
                   <div>
                     <div className="flex items-center gap-2 mb-2">

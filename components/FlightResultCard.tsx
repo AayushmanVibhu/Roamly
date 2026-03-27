@@ -42,7 +42,7 @@ export default function FlightResultCard({ recommendation, badges, onTrack }: Fl
       : `${flight.layoverCount} stop${flight.layoverCount > 1 ? 's' : ''}`
 
   return (
-    <article className="rounded-3xl border border-dark-700 bg-dark-800 shadow-[0_16px_45px_-28px_rgba(0,0,0,0.6)] transition-all hover:-translate-y-1 hover:shadow-[0_20px_55px_-28px_rgba(56,189,248,0.2)]">
+    <article className="rounded-3xl border border-white/10 bg-dark-800/60 backdrop-blur-xl shadow-[0_16px_45px_-28px_rgba(0,0,0,0.6)] transition-all hover:-translate-y-1 hover:shadow-[0_20px_55px_-28px_rgba(56,189,248,0.2)]">
       <div className="p-6 md:p-7">
         <div className="flex flex-wrap items-center gap-2 mb-4">
           {badges.map(badge => (
@@ -68,35 +68,35 @@ export default function FlightResultCard({ recommendation, badges, onTrack }: Fl
             </p>
 
             <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
-              <div className="rounded-xl bg-dark-900 border border-dark-700 p-3">
-                <p className="text-dark-400">Duration</p>
-                <p className="mt-1 font-semibold text-dark-100 flex items-center gap-1">
-                  <Clock3 className="w-3.5 h-3.5 text-dark-400" aria-hidden="true" />
+              <div className="rounded-xl bg-dark-900/50 border border-white/10 p-3">
+                <p className="text-dark-300">Duration</p>
+                <p className="mt-1 font-semibold text-white flex items-center gap-1">
+                  <Clock3 className="w-3.5 h-3.5 text-dark-300" aria-hidden="true" />
                   {formatDuration(flight.totalDuration)}
                 </p>
               </div>
-              <div className="rounded-xl bg-dark-900 border border-dark-700 p-3">
-                <p className="text-dark-400">Stops</p>
-                <p className="mt-1 font-semibold text-dark-100">{stopLabel}</p>
+              <div className="rounded-xl bg-dark-900/50 border border-white/10 p-3">
+                <p className="text-dark-300">Stops</p>
+                <p className="mt-1 font-semibold text-white">{stopLabel}</p>
               </div>
-              <div className="rounded-xl bg-dark-900 border border-dark-700 p-3">
-                <p className="text-dark-400">Baggage</p>
-                <p className="mt-1 font-semibold text-dark-100 flex items-center gap-1">
-                  <Luggage className="w-3.5 h-3.5 text-dark-400" aria-hidden="true" />
+              <div className="rounded-xl bg-dark-900/50 border border-white/10 p-3">
+                <p className="text-dark-300">Baggage</p>
+                <p className="mt-1 font-semibold text-white flex items-center gap-1">
+                  <Luggage className="w-3.5 h-3.5 text-dark-300" aria-hidden="true" />
                   {baggageLabel}
                 </p>
               </div>
-              <div className="rounded-xl bg-dark-900 border border-dark-700 p-3">
-                <p className="text-dark-400">Route</p>
-                <p className="mt-1 font-semibold text-dark-100 flex items-center gap-1">
-                  <Plane className="w-3.5 h-3.5 text-dark-400" aria-hidden="true" />
+              <div className="rounded-xl bg-dark-900/50 border border-white/10 p-3">
+                <p className="text-dark-300">Route</p>
+                <p className="mt-1 font-semibold text-white flex items-center gap-1">
+                  <Plane className="w-3.5 h-3.5 text-dark-300" aria-hidden="true" />
                   {flight.segments.length} leg{flight.segments.length > 1 ? 's' : ''}
                 </p>
               </div>
             </div>
           </div>
 
-          <div className="rounded-2xl border border-dark-700 bg-gradient-to-b from-dark-800 to-dark-900 p-5 flex flex-col justify-between">
+          <div className="rounded-2xl border border-white/10 bg-dark-900/50 backdrop-blur-sm p-5 flex flex-col justify-between">
             <div>
               <p className="text-sm text-dark-400">Total price</p>
               <p className="text-4xl font-bold text-dark-50 mt-1">
@@ -110,7 +110,7 @@ export default function FlightResultCard({ recommendation, badges, onTrack }: Fl
             <div className="mt-5 space-y-2">
               <button
                 onClick={() => setShowDetails(current => !current)}
-                className="w-full rounded-xl border border-dark-600 bg-dark-800 px-4 py-2.5 text-sm font-medium text-dark-200 hover:bg-dark-700 transition"
+                className="w-full rounded-xl border border-white/15 bg-dark-800/60 px-4 py-2.5 text-sm font-medium text-white hover:bg-dark-700/60 transition"
               >
                 {showDetails ? 'Hide details' : 'View details'}
               </button>
@@ -143,7 +143,7 @@ export default function FlightResultCard({ recommendation, badges, onTrack }: Fl
         </div>
 
         {showDetails && (
-          <div className="mt-6 rounded-2xl border border-dark-700 bg-dark-900 p-4">
+          <div className="mt-6 rounded-2xl border border-white/10 bg-dark-900/50 backdrop-blur-sm p-4">
             <h4 className="text-sm font-semibold text-dark-100 mb-3 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-violet-400" aria-hidden="true" />
               Detailed leg summary
@@ -152,7 +152,7 @@ export default function FlightResultCard({ recommendation, badges, onTrack }: Fl
               {flight.segments.map(segment => (
                 <div
                   key={segment.id}
-                  className="flex flex-col md:flex-row md:items-center md:justify-between rounded-lg bg-dark-800 border border-dark-700 px-3 py-2 text-sm"
+                  className="flex flex-col md:flex-row md:items-center md:justify-between rounded-lg bg-dark-800/50 border border-white/10 px-3 py-2 text-sm"
                 >
                   <p className="text-dark-200 font-medium">
                     {segment.departureAirport} → {segment.arrivalAirport}

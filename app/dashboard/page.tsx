@@ -52,10 +52,10 @@ export default function DashboardPage() {
         {/* Stats Grid */}
         <div className="grid md:grid-cols-4 gap-6 mb-8">
           {/* Total Trips */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-primary-900/30 p-3 rounded-lg">
-                <Plane className="w-6 h-6 text-primary-600" />
+                <Plane className="w-6 h-6 text-primary-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">{stats.totalTripsPlanned}</div>
@@ -69,10 +69,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Total Saved */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-green-900/30 p-3 rounded-lg">
-                <DollarSign className="w-6 h-6 text-green-600" />
+                <DollarSign className="w-6 h-6 text-green-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">${stats.totalSaved}</div>
@@ -85,10 +85,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Average Score */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-blue-900/30 p-3 rounded-lg">
-                <Award className="w-6 h-6 text-blue-600" />
+                <Award className="w-6 h-6 text-blue-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">{stats.averageScore}</div>
@@ -101,10 +101,10 @@ export default function DashboardPage() {
           </div>
 
           {/* Recent Activity */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl shadow-sm p-6">
             <div className="flex items-center gap-3 mb-3">
               <div className="bg-purple-900/30 p-3 rounded-lg">
-                <Clock className="w-6 h-6 text-purple-600" />
+                <Clock className="w-6 h-6 text-purple-400" />
               </div>
               <div>
                 <div className="text-2xl font-bold text-dark-50">{stats.recentSearches.length}</div>
@@ -131,7 +131,7 @@ export default function DashboardPage() {
           </div>
 
           {savedTrips.length === 0 && (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-8 text-center text-dark-300">
+            <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-8 text-center text-dark-200">
               No saved trips yet. Start a search to create your first trip.
             </div>
           )}
@@ -141,7 +141,7 @@ export default function DashboardPage() {
         <div>
           <h2 className="text-2xl font-bold text-dark-50 mb-6">Recent Searches</h2>
           {stats.recentSearches.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 text-dark-300">
+            <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 text-dark-200">
               No recent searches yet.
             </div>
           ) : null}

@@ -75,30 +75,29 @@ export default function PlannerPage() {
         </div>
 
         {/* Trip Input Form */}
-        <div className="bg-dark-800 rounded-2xl shadow-xl border border-dark-700 p-8 mb-8">
+        <div className="bg-dark-800/60 backdrop-blur-xl rounded-2xl shadow-xl border border-white/10 p-8 mb-8">
           <TripInputForm onSubmit={handleSearch} isLoading={isSearching} />
         </div>
 
-        {/* Info Cards */}
         <div className="grid md:grid-cols-3 gap-6">
-          <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-sm">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-sm">
             <div className="text-3xl mb-2">🎯</div>
-            <h3 className="font-semibold mb-2 text-dark-50">Personalized Results</h3>
-            <p className="text-sm text-dark-300">
+            <h3 className="font-semibold mb-2 text-white">Personalized Results</h3>
+            <p className="text-sm text-dark-200">
               Get recommendations tailored to your specific needs and preferences
             </p>
           </div>
-          <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-sm">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-sm">
             <div className="text-3xl mb-2">💰</div>
-            <h3 className="font-semibold mb-2 text-dark-50">Price Intelligence</h3>
-            <p className="text-sm text-dark-300">
+            <h3 className="font-semibold mb-2 text-white">Price Intelligence</h3>
+            <p className="text-sm text-dark-200">
               See if you&apos;re getting a good deal with our AI price analysis
             </p>
           </div>
-          <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 shadow-sm">
+          <div className="bg-dark-800/60 backdrop-blur-xl border border-white/10 rounded-xl p-6 shadow-sm">
             <div className="text-3xl mb-2">⚡</div>
-            <h3 className="font-semibold mb-2 text-dark-50">Instant Insights</h3>
-            <p className="text-sm text-dark-300">
+            <h3 className="font-semibold mb-2 text-white">Instant Insights</h3>
+            <p className="text-sm text-dark-200">
               Understand why each option is worth considering or avoiding
             </p>
           </div>

@@ -386,7 +386,7 @@ export default function AIAssistantPage() {
             <div className="flex items-center gap-4">
               <button
                 onClick={() => setIsConstraintPanelOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-dark-700 bg-dark-800/90 px-3 py-1.5 text-xs text-dark-200 hover:text-dark-50 transition"
+                className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-dark-800/50 backdrop-blur-sm px-3 py-1.5 text-xs text-white hover:text-white/80 transition"
               >
                 <SlidersHorizontal className="w-3.5 h-3.5" />
                 Trip details
@@ -428,7 +428,7 @@ export default function AIAssistantPage() {
         <div className="max-w-4xl mx-auto flex items-center gap-3">
           <button
             onClick={() => setIsConstraintPanelOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-dark-700 bg-dark-800/80 px-4 py-2.5 text-sm text-dark-100 hover:bg-dark-800 transition"
+            className="inline-flex items-center gap-2 rounded-xl border border-white/15 bg-dark-800/50 backdrop-blur-sm px-4 py-2.5 text-sm text-white hover:bg-dark-800/70 transition"
           >
             <SlidersHorizontal className="w-4 h-4 text-primary-400" />
             Trip details
@@ -457,8 +457,8 @@ export default function AIAssistantPage() {
             className="absolute inset-0 bg-black/60"
             aria-label="Close trip details panel"
           />
-          <div className="relative w-full sm:max-w-lg bg-dark-900 border border-dark-800 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-hidden animate-sheet-enter">
-            <div className="px-4 py-3 border-b border-dark-800 flex items-center justify-between">
+          <div className="relative w-full sm:max-w-lg bg-dark-900/90 backdrop-blur-xl border border-white/10 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-hidden animate-sheet-enter">
+            <div className="px-4 py-3 border-b border-white/10 flex items-center justify-between">
               <div>
                 <h3 className="text-sm font-semibold text-dark-100">Trip details</h3>
                 <p className="text-xs text-dark-400">Open only when you need it</p>
@@ -477,7 +477,7 @@ export default function AIAssistantPage() {
                 onRemoveConstraint={handleRemoveConstraint}
               />
             </div>
-            <div className="border-t border-dark-800 p-3">
+            <div className="border-t border-white/10 p-3">
               <RecommendationTrigger
                 constraints={constraints}
                 onGenerateRecommendations={handleGenerateRecommendations}

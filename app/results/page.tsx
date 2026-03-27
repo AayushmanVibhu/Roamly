@@ -237,8 +237,8 @@ export default function ResultsPage() {
       </nav>
 
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 md:py-10">
-        <div className="rounded-3xl border border-dark-700 bg-gradient-to-r from-[#f97316]/15 via-[#7c3aed]/10 to-[#2563eb]/15 shadow-[0_18px_50px_-28px_rgba(0,0,0,0.5)] p-6 md:p-8">
-          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-dark-200 bg-dark-800/70 border border-dark-700 rounded-full px-3 py-1">
+        <div className="rounded-3xl border border-white/10 bg-dark-800/50 backdrop-blur-xl shadow-[0_18px_50px_-28px_rgba(0,0,0,0.5)] p-6 md:p-8">
+          <p className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-white bg-white/10 border border-white/20 rounded-full px-3 py-1">
             <Sparkles className="w-3.5 h-3.5" />
             Curated for your trip
           </p>
@@ -274,7 +274,7 @@ export default function ResultsPage() {
       {trackModalOpen && (
         <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" aria-label="Track price">
           <button className="absolute inset-0 bg-black/60" onClick={closeTrackModal} aria-label="Close tracking dialog" />
-          <div className="relative w-full sm:w-[520px] bg-dark-900 rounded-t-3xl sm:rounded-3xl shadow-2xl border border-dark-700 p-6 sm:p-7 animate-sheet-enter">
+          <div className="relative w-full sm:w-[520px] bg-dark-900/90 backdrop-blur-xl rounded-t-3xl sm:rounded-3xl shadow-2xl border border-white/10 p-6 sm:p-7 animate-sheet-enter">
             {!trackSuccess ? (
               <>
                 <h3 className="text-2xl font-semibold text-dark-50">We&apos;ll keep an eye on this for you</h3>
@@ -283,23 +283,23 @@ export default function ResultsPage() {
                 </p>
 
                 <div className="mt-5 space-y-3">
-                  <label className="flex items-start gap-3 rounded-xl border border-dark-700 bg-dark-800 p-3">
+                  <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-dark-800/60 p-3">
                     <input
                       type="checkbox"
                       checked={notifyDrop}
                       onChange={event => setNotifyDrop(event.target.checked)}
                       className="mt-1"
                     />
-                    <span className="text-sm text-dark-200">Notify me if price drops</span>
+                    <span className="text-sm text-white">Notify me if price drops</span>
                   </label>
-                  <label className="flex items-start gap-3 rounded-xl border border-dark-700 bg-dark-800 p-3">
+                  <label className="flex items-start gap-3 rounded-xl border border-white/10 bg-dark-800/60 p-3">
                     <input
                       type="checkbox"
                       checked={notifyBetter}
                       onChange={event => setNotifyBetter(event.target.checked)}
                       className="mt-1"
                     />
-                    <span className="text-sm text-dark-200">Notify me if better option appears</span>
+                    <span className="text-sm text-white">Notify me if better option appears</span>
                   </label>
                 </div>
 
@@ -310,7 +310,7 @@ export default function ResultsPage() {
                     value={trackEmail}
                     onChange={event => setTrackEmail(event.target.value)}
                     placeholder="you@example.com"
-                    className="mt-1 w-full rounded-xl border border-dark-700 bg-dark-800 text-dark-100 placeholder-dark-500 px-3 py-2.5 outline-none focus:border-primary-500"
+                    className="mt-1 w-full rounded-xl border border-white/10 bg-dark-800/60 text-white placeholder-dark-400 px-3 py-2.5 outline-none focus:border-primary-500"
                   />
                 </div>
 
@@ -321,7 +321,7 @@ export default function ResultsPage() {
                 <div className="mt-6 flex flex-col sm:flex-row gap-3 sm:justify-end">
                   <button
                     onClick={closeTrackModal}
-                    className="rounded-xl border border-dark-700 px-4 py-2.5 text-dark-200 hover:bg-dark-800 transition"
+                    className="rounded-xl border border-white/15 px-4 py-2.5 text-white hover:bg-white/10 transition"
                   >
                     Cancel
                   </button>
