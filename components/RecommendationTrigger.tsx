@@ -33,12 +33,12 @@ export default function RecommendationTrigger({
   if (!hasDestination) missingFields.push('destination')
 
   return (
-    <div className="border-t border-dark-700 p-4 bg-dark-900">
+    <div className="rounded-2xl border border-dark-700 bg-dark-900/80 p-3 sm:p-4">
       <button
         onClick={onGenerateRecommendations}
         disabled={isDisabled}
         className={`
-          w-full flex items-center justify-center gap-2 px-6 py-4 rounded-lg font-semibold text-lg transition
+          w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-base transition
           ${
             isDisabled
               ? 'bg-dark-800 text-dark-600 cursor-not-allowed'
@@ -61,7 +61,7 @@ export default function RecommendationTrigger({
       </button>
 
       {!hasMinimumInfo && !isGenerating && (
-        <div className="flex items-start gap-2 mt-3 p-3 bg-orange-900/20 border border-orange-700/30 rounded-lg">
+        <div className="flex items-start gap-2 mt-3 p-2.5 bg-orange-900/20 border border-orange-700/30 rounded-lg">
           <AlertCircle className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
           <p className="text-xs text-orange-200">
             Please provide at least <strong>origin</strong> and <strong>destination</strong> to generate recommendations

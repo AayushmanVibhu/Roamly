@@ -35,6 +35,14 @@
   .text-balance {
     text-wrap: balance;
   }
+
+  .animate-sheet-enter {
+    animation: sheetEnterMobile 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .animate-float-soft {
+    animation: floatSoft 2.8s ease-in-out infinite;
+  }
   
   /* Custom scrollbar for dark theme */
   .custom-scrollbar::-webkit-scrollbar {
@@ -52,5 +60,26 @@
   
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-dark-500;
+  }
+}
+
+@keyframes sheetEnterMobile {
+  from {
+    opacity: 0;
+    transform: translateY(22px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes floatSoft {
+  0%,
+  100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-4px);
   }
 }
