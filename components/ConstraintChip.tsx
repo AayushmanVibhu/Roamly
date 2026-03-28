@@ -41,9 +41,9 @@ function formatValue(field: keyof TravelConstraints, value: any): string {
 
 export default function ConstraintChip({ field, value, onRemove, onEdit }: ConstraintChipProps) {
   return (
-    <div className="inline-flex items-center gap-2 bg-gradient-to-br from-primary-900/40 to-purple-900/40 border border-primary-700/50 text-primary-100 px-3 py-2 rounded-lg text-sm group">
+    <div className="group inline-flex items-center gap-2 rounded-2xl border border-white/10 bg-white/6 px-3 py-2 text-sm text-slate-100">
       <div className="flex flex-col">
-        <span className="text-xs text-primary-400">{fieldLabels[field]}</span>
+        <span className="text-xs text-slate-400">{fieldLabels[field]}</span>
         <span className="font-medium">{formatValue(field, value)}</span>
       </div>
       
@@ -51,7 +51,7 @@ export default function ConstraintChip({ field, value, onRemove, onEdit }: Const
         {onEdit && (
           <button
             onClick={() => onEdit(field)}
-            className="opacity-0 group-hover:opacity-100 transition p-1 hover:bg-primary-800/50 rounded"
+            className="rounded p-1 opacity-0 transition hover:bg-white/10 group-hover:opacity-100"
             aria-label="Edit constraint"
           >
             <Edit2 className="w-3 h-3" />
@@ -59,7 +59,7 @@ export default function ConstraintChip({ field, value, onRemove, onEdit }: Const
         )}
         <button
           onClick={() => onRemove(field)}
-          className="opacity-70 hover:opacity-100 transition p-1 hover:bg-primary-800/50 rounded"
+          className="rounded p-1 opacity-70 transition hover:bg-white/10 hover:opacity-100"
           aria-label="Remove constraint"
         >
           <X className="w-3 h-3" />

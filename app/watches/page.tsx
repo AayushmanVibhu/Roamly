@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useMemo, useState } from 'react'
-import Link from 'next/link'
-import { Plane, ArrowLeft, RefreshCcw, BellRing, PauseCircle, PlayCircle, Trash2 } from 'lucide-react'
+import { BellRing, PauseCircle, PlayCircle, RefreshCcw, Trash2 } from 'lucide-react'
+import SiteHeader from '@/components/SiteHeader'
+import { getEffectiveCheckIntervalMinutes } from '@/lib/watchIntervals'
 import { TravelWatch, TravelWatchStatus } from '@/types'
 
 type WatchFilter = 'all' | TravelWatchStatus
@@ -96,55 +97,44 @@ export default function WatchesPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                Roamly
-              </span>
-            </Link>
-            <div className="flex items-center gap-4 text-sm">
-              <Link href="/results" className="text-dark-300 hover:text-dark-50 transition">Results</Link>
-              <Link href="/assistant" className="text-dark-300 hover:text-dark-50 transition">Assistant</Link>
-              <Link href="/" className="flex items-center gap-2 text-dark-300 hover:text-dark-50 transition">
-                <ArrowLeft className="w-4 h-4" />
-                Home
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="app-shell">
+      <SiteHeader />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">My Watches</h1>
-          <p className="text-dark-300">
-            Manage your price watches. Roamly will keep checking and alert you when matching deals appear.
+      <div className="app-content py-8 md:py-10">
+        <div className="glass-panel p-6 md:p-8">
+          <div className="eyebrow">
+            <BellRing className="h-3.5 w-3.5" />
+            Active route monitoring
+          </div>
+          <h1 className="mt-4 font-[family:var(--font-display)] text-3xl font-semibold text-white md:text-5xl">
+            Your flight watches
+          </h1>
+          <p className="mt-3 max-w-3xl text-slate-300">
+            Manage the routes Roamly is monitoring for you. Watches check every few hours by
+            default and tighten to hourly as departure gets close.
           </p>
         </div>
 
-        <div className="bg-dark-800 border border-dark-700 rounded-xl p-4 mb-6">
-          <div className="flex flex-col md:flex-row gap-3">
+        <div className="mt-6 soft-panel p-4">
+          <div className="flex flex-col gap-3 md:flex-row">
             <input
               type="email"
               value={email}
               onChange={e => setEmail(e.target.value)}
               placeholder="Enter email used for watch alerts"
-              className="flex-1 px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500"
+              className="field-shell flex-1"
             />
             <button
               onClick={() => loadWatches(email, filter)}
               disabled={isLoading}
-              className="px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-700 text-white disabled:opacity-60 inline-flex items-center gap-2"
+              className="action-primary"
             >
-              <RefreshCcw className="w-4 h-4" />
-              {isLoading ? 'Loading...' : 'Load Watches'}
+              <RefreshCcw className="h-4 w-4" />
+              {isLoading ? 'Loading...' : 'Load watches'}
             </button>
           </div>
-          <div className="flex flex-wrap gap-2 mt-3">
+
+          <div className="mt-3 flex flex-wrap gap-2">
             {(['all', 'active', 'paused', 'matched', 'cancelled'] as WatchFilter[]).map(status => (
               <button
                 key={status}
@@ -152,10 +142,10 @@ export default function WatchesPage() {
                   setFilter(status)
                   void loadWatches(email, status)
                 }}
-                className={`px-3 py-1 rounded-full text-xs border ${
+                className={`rounded-full px-3 py-1 text-xs capitalize transition ${
                   filter === status
-                    ? 'bg-primary-900/30 text-primary-300 border-primary-700/40'
-                    : 'bg-dark-900 text-dark-300 border-dark-700'
+                    ? 'bg-white text-slate-950'
+                    : 'border border-white/10 bg-white/6 text-slate-300 hover:bg-white/10'
                 }`}
               >
                 {status}
@@ -165,87 +155,94 @@ export default function WatchesPage() {
         </div>
 
         {statusMessage && (
-          <div className="mb-4 bg-primary-900/20 border border-primary-700/30 text-primary-300 rounded-lg p-3 text-sm">
+          <div className="mt-4 rounded-2xl border border-sky-400/25 bg-sky-400/10 p-3 text-sm text-sky-100">
             {statusMessage}
           </div>
         )}
 
-        <div className="space-y-4">
+        <div className="mt-6 space-y-4">
           {filteredWatches.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-8 text-center text-dark-300">
+            <div className="soft-panel p-8 text-center text-slate-300">
               No watches to show for this filter.
             </div>
           ) : (
-            filteredWatches.map(watch => (
-              <div key={watch.id} className="bg-dark-800 border border-dark-700 rounded-xl p-5">
-                <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                  <div>
-                    <div className="flex items-center gap-2 mb-2">
-                      <BellRing className="w-4 h-4 text-primary-400" />
-                      <h3 className="text-lg font-semibold text-dark-50">
-                        {watch.preferences.origin} → {watch.preferences.destination}
-                      </h3>
-                      <span className={`px-2 py-0.5 rounded-full text-xs border ${statusBadgeClass(watch.status)}`}>
-                        {watch.status}
-                      </span>
+            filteredWatches.map(watch => {
+              const effectiveInterval = getEffectiveCheckIntervalMinutes(watch)
+
+              return (
+                <div key={watch.id} className="glass-panel p-5">
+                  <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+                    <div>
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <h3 className="text-xl font-semibold text-white">
+                          {watch.preferences.origin} → {watch.preferences.destination}
+                        </h3>
+                        <span className={`status-pill ${statusBadgeClass(watch.status)}`}>
+                          {watch.status}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1 text-sm text-slate-300">
+                        <div>Target price: ${watch.targetPrice} ({watch.preferences.currency})</div>
+                        <div>Departure: {watch.preferences.departureDate}</div>
+                        <div>Current cadence: every {effectiveInterval} minutes</div>
+                        {watch.lastCheckedAt && <div>Last checked: {formatDateTime(watch.lastCheckedAt)}</div>}
+                        {watch.latestMatch && (
+                          <div className="text-emerald-300">
+                            Latest match: ${watch.latestMatch.estimatedTotal} at {formatDateTime(watch.latestMatch.matchedAt)}
+                          </div>
+                        )}
+                      </div>
                     </div>
-                    <div className="text-sm text-dark-300 space-y-1">
-                      <div>Target price: ${watch.targetPrice} ({watch.preferences.currency})</div>
-                      <div>Checking every {watch.checkIntervalMinutes} minutes</div>
-                      <div>Departure: {watch.preferences.departureDate}</div>
-                      {watch.lastCheckedAt && <div>Last checked: {formatDateTime(watch.lastCheckedAt)}</div>}
-                      {watch.latestMatch && (
-                        <div className="text-primary-300">
-                          Latest match: ${watch.latestMatch.estimatedTotal} at {formatDateTime(watch.latestMatch.matchedAt)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex flex-wrap gap-2">
-                    {watch.status === 'active' ? (
-                      <button
-                        onClick={() => handleUpdateWatch(watch.id, 'pause')}
-                        disabled={updatingWatchId === watch.id}
-                        className="px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 text-sm inline-flex items-center gap-2"
-                      >
-                        <PauseCircle className="w-4 h-4" />
-                        Pause
-                      </button>
-                    ) : (
-                      watch.status !== 'cancelled' && (
+
+                    <div className="flex flex-wrap gap-2">
+                      {watch.status === 'active' ? (
                         <button
-                          onClick={() => handleUpdateWatch(watch.id, 'resume')}
+                          onClick={() => handleUpdateWatch(watch.id, 'pause')}
                           disabled={updatingWatchId === watch.id}
-                          className="px-3 py-2 rounded-lg bg-dark-900 border border-dark-700 text-dark-100 text-sm inline-flex items-center gap-2"
+                          className="action-secondary"
                         >
-                          <PlayCircle className="w-4 h-4" />
-                          Resume
+                          <PauseCircle className="h-4 w-4" />
+                          Pause
                         </button>
-                      )
-                    )}
+                      ) : (
+                        watch.status !== 'cancelled' && (
+                          <button
+                            onClick={() => handleUpdateWatch(watch.id, 'resume')}
+                            disabled={updatingWatchId === watch.id}
+                            className="action-secondary"
+                          >
+                            <PlayCircle className="h-4 w-4" />
+                            Resume
+                          </button>
+                        )
+                      )}
 
-                    {watch.status !== 'cancelled' && (
+                      {watch.status !== 'cancelled' && (
+                        <button
+                          onClick={() => handleUpdateWatch(watch.id, 'cancel')}
+                          disabled={updatingWatchId === watch.id}
+                          className="rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-sm font-semibold text-amber-100 transition hover:bg-amber-400/15"
+                        >
+                          Cancel
+                        </button>
+                      )}
+
                       <button
-                        onClick={() => handleUpdateWatch(watch.id, 'cancel')}
+                        onClick={() => handleDeleteWatch(watch.id)}
                         disabled={updatingWatchId === watch.id}
-                        className="px-3 py-2 rounded-lg bg-yellow-900/20 border border-yellow-700/40 text-yellow-300 text-sm"
+                        className="rounded-2xl border border-rose-400/25 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-100 transition hover:bg-rose-400/15"
                       >
-                        Cancel
+                        <span className="inline-flex items-center gap-2">
+                          <Trash2 className="h-4 w-4" />
+                          Delete
+                        </span>
                       </button>
-                    )}
-
-                    <button
-                      onClick={() => handleDeleteWatch(watch.id)}
-                      disabled={updatingWatchId === watch.id}
-                      className="px-3 py-2 rounded-lg bg-red-900/20 border border-red-700/40 text-red-300 text-sm inline-flex items-center gap-2"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                      Delete
-                    </button>
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))
+              )
+            })
           )}
         </div>
       </div>
@@ -254,10 +251,10 @@ export default function WatchesPage() {
 }
 
 function statusBadgeClass(status: TravelWatchStatus): string {
-  if (status === 'active') return 'bg-green-900/20 text-green-300 border-green-700/40'
-  if (status === 'paused') return 'bg-yellow-900/20 text-yellow-300 border-yellow-700/40'
-  if (status === 'matched') return 'bg-primary-900/20 text-primary-300 border-primary-700/40'
-  return 'bg-dark-900 text-dark-300 border-dark-700'
+  if (status === 'active') return 'border-emerald-400/25 bg-emerald-400/10 text-emerald-100'
+  if (status === 'paused') return 'border-amber-400/25 bg-amber-400/10 text-amber-100'
+  if (status === 'matched') return 'border-sky-400/25 bg-sky-400/10 text-sky-100'
+  return 'border-white/10 bg-white/6 text-slate-300'
 }
 
 function formatDateTime(value: string): string {

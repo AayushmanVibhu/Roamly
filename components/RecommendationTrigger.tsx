@@ -1,5 +1,5 @@
+import { AlertCircle, ArrowRight, BellRing, Sparkles } from 'lucide-react'
 import { TravelConstraints } from '@/types'
-import { Sparkles, ArrowRight, AlertCircle, BellRing } from 'lucide-react'
 
 interface RecommendationTriggerProps {
   constraints: TravelConstraints
@@ -27,83 +27,64 @@ export default function RecommendationTrigger({
   const hasMinimumInfo = hasOrigin && hasDestination
   const isDisabled = !hasMinimumInfo || isGenerating
 
-  // Determine which fields are missing
-  const missingFields: string[] = []
-  if (!hasOrigin) missingFields.push('origin')
-  if (!hasDestination) missingFields.push('destination')
-
   return (
-    <div className="rounded-2xl border border-dark-700 bg-dark-900/80 p-3 sm:p-4">
+    <div className="rounded-2xl border border-white/10 bg-white/6 p-4">
       <button
         onClick={onGenerateRecommendations}
         disabled={isDisabled}
-        className={`
-          w-full flex items-center justify-center gap-2 px-6 py-3.5 rounded-xl font-semibold text-base transition
-          ${
-            isDisabled
-              ? 'bg-dark-800 text-dark-600 cursor-not-allowed'
-              : 'bg-gradient-to-r from-primary-600 to-purple-600 hover:from-primary-700 hover:to-purple-700 text-white shadow-lg hover:shadow-xl'
-          }
-        `}
+        className={`flex w-full items-center justify-center gap-2 rounded-2xl px-6 py-3.5 text-base font-semibold transition ${
+          isDisabled
+            ? 'bg-white/8 text-slate-500'
+            : 'bg-sky-300 text-slate-950 hover:bg-sky-200'
+        }`}
       >
-        {isGenerating ? (
-          <>
-            <Sparkles className="w-5 h-5 animate-spin" />
-            <span>Generating Recommendations...</span>
-          </>
-        ) : (
-          <>
-            <Sparkles className="w-5 h-5" />
-            <span>Generate Recommendations</span>
-            <ArrowRight className="w-5 h-5" />
-          </>
-        )}
+        <Sparkles className={`h-5 w-5 ${isGenerating ? 'animate-spin' : ''}`} />
+        <span>{isGenerating ? 'Generating recommendations...' : 'Generate recommendations'}</span>
+        {!isGenerating && <ArrowRight className="h-5 w-5" />}
       </button>
 
       {!hasMinimumInfo && !isGenerating && (
-        <div className="flex items-start gap-2 mt-3 p-2.5 bg-orange-900/20 border border-orange-700/30 rounded-lg">
-          <AlertCircle className="w-4 h-4 text-orange-400 mt-0.5 flex-shrink-0" />
-          <p className="text-xs text-orange-200">
-            Please provide at least <strong>origin</strong> and <strong>destination</strong> to generate recommendations
+        <div className="mt-3 flex items-start gap-2 rounded-xl border border-amber-400/20 bg-amber-400/10 p-3">
+          <AlertCircle className="mt-0.5 h-4 w-4 text-amber-300" />
+          <p className="text-xs text-amber-100">
+            Add at least <strong>origin</strong> and <strong>destination</strong> before searching.
           </p>
         </div>
       )}
 
       {hasMinimumInfo && !isGenerating && (
-        <p className="text-xs text-center text-dark-400 mt-3">
-          Ready to search! Click to find the best flights matching your preferences
+        <p className="mt-3 text-center text-xs text-slate-400">
+          Search now, or create a watch if the right fare is not live yet.
         </p>
       )}
 
       {onCreateWatch && onWatchEmailChange && (
-        <div className="mt-4 bg-dark-800 border border-dark-700 rounded-lg p-3">
-          <div className="flex items-center gap-2 mb-2 text-sm text-dark-200">
-            <BellRing className="w-4 h-4 text-primary-400" />
-            <span>Or create a watch from chat</span>
+        <div className="mt-4 rounded-xl border border-white/10 bg-[rgba(6,12,26,0.72)] p-3">
+          <div className="mb-2 flex items-center gap-2 text-sm text-slate-200">
+            <BellRing className="h-4 w-4 text-amber-300" />
+            <span>Create a watch from chat</span>
           </div>
           <div className="flex gap-2">
             <input
               type="email"
               value={watchEmail || ''}
-              onChange={(e) => onWatchEmailChange(e.target.value)}
+              onChange={e => onWatchEmailChange(e.target.value)}
               placeholder="Email for deal alerts"
-              className="flex-1 px-3 py-2 rounded-md bg-dark-900 border border-dark-700 text-dark-100 placeholder-dark-500 text-sm"
+              className="field-shell flex-1 text-sm"
             />
             <button
               onClick={onCreateWatch}
               disabled={!hasMinimumInfo || isCreatingWatch}
-              className={`px-3 py-2 rounded-md text-sm font-medium ${
+              className={`rounded-xl px-3 py-2 text-sm font-medium transition ${
                 !hasMinimumInfo || isCreatingWatch
-                  ? 'bg-dark-700 text-dark-500 cursor-not-allowed'
-                  : 'bg-primary-600 hover:bg-primary-700 text-white'
+                  ? 'bg-white/8 text-slate-500'
+                  : 'bg-amber-300 text-slate-950 hover:bg-amber-200'
               }`}
             >
-              {isCreatingWatch ? 'Saving...' : 'Create Watch'}
+              {isCreatingWatch ? 'Saving...' : 'Create watch'}
             </button>
           </div>
-          {watchStatusMessage && (
-            <p className="text-xs text-primary-300 mt-2">{watchStatusMessage}</p>
-          )}
+          {watchStatusMessage && <p className="mt-2 text-xs text-sky-100">{watchStatusMessage}</p>}
         </div>
       )}
     </div>

@@ -2,18 +2,18 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import { ChatMessage, TravelConstraints, QuickReply } from '@/types'
 import ChatPanel from '@/components/ChatPanel'
 import ConstraintSummaryPanel from '@/components/ConstraintSummaryPanel'
 import RecommendationTrigger from '@/components/RecommendationTrigger'
+import SiteHeader from '@/components/SiteHeader'
 import { extractConstraints, generateConfirmation } from '@/lib/constraintExtractor'
 import { 
   convertConstraintsToPreferences, 
   validateConstraints, 
   saveTripPreferences 
 } from '@/lib/tripPreferencesUtils'
-import { Plane, ArrowLeft, SlidersHorizontal, X, Sparkles } from 'lucide-react'
+import { SlidersHorizontal, X, Sparkles } from 'lucide-react'
 
 // Generate contextual quick replies based on missing information
 const generateQuickReplies = (mergedConstraints: TravelConstraints): QuickReply[] => {
@@ -345,7 +345,6 @@ export default function AIAssistantPage() {
           email: watchEmail.trim(),
           preferences,
           targetPrice: constraintsRef.current.budget || preferences.maxBudget,
-          checkIntervalMinutes: 60,
         }),
       })
 
@@ -366,56 +365,30 @@ export default function AIAssistantPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-dark-950 via-[#071428] to-dark-950 flex flex-col">
-      {/* Header */}
-      <nav className="border-b border-dark-800/80 bg-dark-900/75 backdrop-blur-md sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-4">
-              <Link href="/" className="flex items-center gap-2">
-                <ArrowLeft className="w-5 h-5 text-dark-400 hover:text-dark-200 transition" />
-              </Link>
-              <div className="flex items-center gap-2">
-                <Plane className="w-8 h-8 text-primary-600" />
-                <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                  Roamly AI
-                </span>
-              </div>
-            </div>
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setIsConstraintPanelOpen(true)}
-                className="inline-flex items-center gap-2 rounded-full border border-dark-700 bg-dark-800/90 px-3 py-1.5 text-xs text-dark-200 hover:text-dark-50 transition"
-              >
-                <SlidersHorizontal className="w-3.5 h-3.5" />
-                Trip details
-              </button>
-              <Link
-                href="/planner"
-                className="hidden sm:inline text-dark-300 hover:text-dark-50 transition text-sm"
-              >
-                Classic Form
-              </Link>
-              <Link
-                href="/dashboard"
-                className="hidden sm:inline text-dark-300 hover:text-dark-50 transition text-sm"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/watches"
-                className="hidden sm:inline text-dark-300 hover:text-dark-50 transition text-sm"
-              >
-                My Watches
-              </Link>
-            </div>
-          </div>
-        </div>
-      </nav>
+    <div className="app-shell flex flex-col">
+      <SiteHeader />
 
       {/* Main Content - Chat First */}
-      <div className="flex-1 min-h-0 overflow-hidden">
-        <div className="max-w-4xl h-full mx-auto px-4 sm:px-6 py-4 sm:py-6">
+      <div className="app-content flex-1 min-h-0 overflow-hidden py-4 sm:py-6">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            <div className="eyebrow">
+              <Sparkles className="h-3.5 w-3.5" />
+              Conversational trip intake
+            </div>
+            <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300">
+              Share the route naturally and tighten the watch details only when you need to.
+            </p>
+          </div>
+          <button
+            onClick={() => setIsConstraintPanelOpen(true)}
+            className="action-secondary px-4 py-2.5 text-xs sm:text-sm"
+          >
+            <SlidersHorizontal className="h-4 w-4" />
+            Trip details
+          </button>
+        </div>
+        <div className="mx-auto h-[calc(100vh-16rem)] max-w-4xl">
           <ChatPanel
             messages={messages}
             onSendMessage={handleSendMessage}
@@ -424,13 +397,13 @@ export default function AIAssistantPage() {
         </div>
       </div>
 
-      <div className="border-t border-dark-800 bg-dark-900/90 backdrop-blur-sm px-4 sm:px-6 py-3">
-        <div className="max-w-4xl mx-auto flex items-center gap-3">
+      <div className="border-t border-white/10 bg-[rgba(6,12,26,0.76)] px-4 py-3 backdrop-blur-xl sm:px-6">
+        <div className="app-content flex max-w-4xl items-center gap-3 px-0">
           <button
             onClick={() => setIsConstraintPanelOpen(true)}
-            className="inline-flex items-center gap-2 rounded-xl border border-dark-700 bg-dark-800/80 px-4 py-2.5 text-sm text-dark-100 hover:bg-dark-800 transition"
+            className="action-secondary px-4 py-2.5"
           >
-            <SlidersHorizontal className="w-4 h-4 text-primary-400" />
+            <SlidersHorizontal className="w-4 h-4 text-sky-200" />
             Trip details
           </button>
           <button
@@ -438,10 +411,10 @@ export default function AIAssistantPage() {
             disabled={isGenerating}
             className={`ml-auto inline-flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition ${
               isGenerating
-                ? 'bg-dark-800 text-dark-500 cursor-not-allowed'
+                ? 'bg-white/8 text-slate-500 cursor-not-allowed'
                 : hasMinimumInfo
-                  ? 'bg-gradient-to-r from-primary-600 to-purple-600 text-white hover:from-primary-700 hover:to-purple-700'
-                  : 'bg-dark-800 text-dark-300 hover:bg-dark-700'
+                  ? 'bg-sky-300 text-slate-950 hover:bg-sky-200'
+                  : 'bg-white/8 text-slate-300 hover:bg-white/12'
             }`}
           >
             <Sparkles className={`w-4 h-4 ${isGenerating ? 'animate-spin' : ''}`} />
@@ -457,15 +430,15 @@ export default function AIAssistantPage() {
             className="absolute inset-0 bg-black/60"
             aria-label="Close trip details panel"
           />
-          <div className="relative w-full sm:max-w-lg bg-dark-900 border border-dark-800 rounded-t-3xl sm:rounded-3xl shadow-2xl max-h-[88vh] overflow-hidden animate-sheet-enter">
-            <div className="px-4 py-3 border-b border-dark-800 flex items-center justify-between">
+          <div className="relative w-full overflow-hidden rounded-t-3xl border border-white/10 bg-[rgba(7,14,30,0.96)] shadow-2xl animate-sheet-enter sm:max-w-lg sm:rounded-3xl max-h-[88vh]">
+            <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
               <div>
-                <h3 className="text-sm font-semibold text-dark-100">Trip details</h3>
-                <p className="text-xs text-dark-400">Open only when you need it</p>
+                <h3 className="text-sm font-semibold text-white">Trip details</h3>
+                <p className="text-xs text-slate-400">Open only when you need it</p>
               </div>
               <button
                 onClick={() => setIsConstraintPanelOpen(false)}
-                className="p-2 rounded-lg text-dark-400 hover:text-dark-100 hover:bg-dark-800 transition"
+                className="rounded-lg p-2 text-slate-400 transition hover:bg-white/8 hover:text-white"
                 aria-label="Close trip details panel"
               >
                 <X className="w-4 h-4" />
@@ -477,7 +450,7 @@ export default function AIAssistantPage() {
                 onRemoveConstraint={handleRemoveConstraint}
               />
             </div>
-            <div className="border-t border-dark-800 p-3">
+            <div className="border-t border-white/10 p-3">
               <RecommendationTrigger
                 constraints={constraints}
                 onGenerateRecommendations={handleGenerateRecommendations}

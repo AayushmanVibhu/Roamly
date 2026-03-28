@@ -1,6 +1,6 @@
-import { TravelConstraints } from '@/types'
+import { AlertCircle, Calendar, CheckCircle, DollarSign, MapPin, Plane } from 'lucide-react'
 import ConstraintChip from './ConstraintChip'
-import { CheckCircle, AlertCircle, Plane, MapPin, Calendar, DollarSign } from 'lucide-react'
+import { TravelConstraints } from '@/types'
 
 interface ConstraintSummaryPanelProps {
   constraints: TravelConstraints
@@ -16,7 +16,6 @@ export default function ConstraintSummaryPanel({
   const constraintCount = Object.keys(constraints).length
   const hasMinimumInfo = constraints.origin && constraints.destination
 
-  // Group constraints by category
   const routeConstraints: (keyof TravelConstraints)[] = ['origin', 'destination', 'tripType']
   const dateConstraints: (keyof TravelConstraints)[] = ['departureDate', 'returnDate', 'flexibleDates']
   const budgetConstraints: (keyof TravelConstraints)[] = ['budget', 'passengers']
@@ -33,17 +32,17 @@ export default function ConstraintSummaryPanel({
     icon: React.ReactNode,
     fields: (keyof TravelConstraints)[]
   ) => {
-    const activeFields = fields.filter((field) => constraints[field] !== undefined)
+    const activeFields = fields.filter(field => constraints[field] !== undefined)
     if (activeFields.length === 0) return null
 
     return (
       <div className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
+        <div className="mb-3 flex items-center gap-2">
           {icon}
-          <h3 className="text-sm font-semibold text-dark-300">{title}</h3>
+          <h3 className="text-sm font-semibold text-slate-300">{title}</h3>
         </div>
         <div className="flex flex-wrap gap-2">
-          {activeFields.map((field) => (
+          {activeFields.map(field => (
             <ConstraintChip
               key={field}
               field={field}
@@ -58,80 +57,59 @@ export default function ConstraintSummaryPanel({
   }
 
   return (
-    <div className="flex flex-col h-full bg-dark-900">
-      {/* Header */}
-      <div className="border-b border-dark-700 p-4">
-        <h2 className="text-lg font-semibold text-dark-50 mb-1">Trip Summary</h2>
+    <div className="flex h-full flex-col bg-transparent">
+      <div className="border-b border-white/10 p-4">
+        <h2 className="mb-1 text-lg font-semibold text-white">Trip summary</h2>
         <div className="flex items-center gap-2">
           {hasMinimumInfo ? (
             <>
-              <CheckCircle className="w-4 h-4 text-green-500" />
-              <p className="text-sm text-dark-400">
+              <CheckCircle className="h-4 w-4 text-emerald-400" />
+              <p className="text-sm text-slate-400">
                 {constraintCount} {constraintCount === 1 ? 'constraint' : 'constraints'} set
               </p>
             </>
           ) : (
             <>
-              <AlertCircle className="w-4 h-4 text-orange-500" />
-              <p className="text-sm text-dark-400">Add origin and destination to continue</p>
+              <AlertCircle className="h-4 w-4 text-amber-400" />
+              <p className="text-sm text-slate-400">Add origin and destination to continue</p>
             </>
           )}
         </div>
       </div>
 
-      {/* Constraints */}
       <div className="flex-1 overflow-y-auto p-4">
         {constraintCount === 0 ? (
-          <div className="flex items-center justify-center h-full">
-            <div className="text-center max-w-sm">
-              <div className="bg-dark-800 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                <Plane className="w-8 h-8 text-dark-600" />
+          <div className="flex h-full items-center justify-center">
+            <div className="max-w-sm text-center">
+              <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-full border border-white/10 bg-white/6">
+                <Plane className="h-8 w-8 text-slate-500" />
               </div>
-              <h3 className="text-lg font-medium text-dark-300 mb-2">No constraints yet</h3>
-              <p className="text-sm text-dark-500">
-                Start chatting with the assistant to build your trip preferences
+              <h3 className="mb-2 text-lg font-medium text-slate-200">No constraints yet</h3>
+              <p className="text-sm text-slate-500">
+                Start chatting with the assistant to build your trip preferences.
               </p>
             </div>
           </div>
         ) : (
           <>
-            {renderConstraintGroup(
-              'Route',
-              <MapPin className="w-4 h-4 text-primary-400" />,
-              routeConstraints
-            )}
-            {renderConstraintGroup(
-              'Dates',
-              <Calendar className="w-4 h-4 text-purple-400" />,
-              dateConstraints
-            )}
-            {renderConstraintGroup(
-              'Budget & Passengers',
-              <DollarSign className="w-4 h-4 text-green-400" />,
-              budgetConstraints
-            )}
-            {renderConstraintGroup(
-              'Preferences',
-              <Plane className="w-4 h-4 text-blue-400" />,
-              preferenceConstraints
-            )}
+            {renderConstraintGroup('Route', <MapPin className="h-4 w-4 text-sky-300" />, routeConstraints)}
+            {renderConstraintGroup('Dates', <Calendar className="h-4 w-4 text-indigo-300" />, dateConstraints)}
+            {renderConstraintGroup('Budget & passengers', <DollarSign className="h-4 w-4 text-emerald-300" />, budgetConstraints)}
+            {renderConstraintGroup('Preferences', <Plane className="h-4 w-4 text-amber-300" />, preferenceConstraints)}
           </>
         )}
       </div>
 
-      {/* Footer Stats */}
       {constraintCount > 0 && (
-        <div className="border-t border-dark-700 p-4">
+        <div className="border-t border-white/10 p-4">
           <div className="grid grid-cols-2 gap-4 text-center">
             <div>
-              <div className="text-2xl font-bold text-primary-400">{constraintCount}</div>
-              <div className="text-xs text-dark-500">Constraints</div>
+              <div className="text-2xl font-bold text-sky-300">{constraintCount}</div>
+              <div className="text-xs text-slate-500">Constraints</div>
             </div>
             <div>
-              <div className="text-2xl font-bold text-primary-400">
-                {hasMinimumInfo ? '✓' : '○'}
-              </div>
-              <div className="text-xs text-dark-500">Ready</div>
+              <div className="text-2xl font-bold text-sky-300">{hasMinimumInfo ? 'Yes' : 'Not yet'}</div>
+              <div className="text-xs text-slate-500">Ready</div>
             </div>
           </div>
         </div>

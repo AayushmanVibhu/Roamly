@@ -1,7 +1,8 @@
 'use client'
 
 import Link from 'next/link'
-import { Plane, TrendingUp, Clock, Award, Plus, ArrowRight, DollarSign } from 'lucide-react'
+import { ArrowRight, BellRing, DollarSign, Plane, Radar, Target } from 'lucide-react'
+import SiteHeader from '@/components/SiteHeader'
 
 export default function DashboardPage() {
   const stats = {
@@ -10,158 +11,78 @@ export default function DashboardPage() {
     averageScore: 0,
     recentSearches: [] as Array<{ id: string; route: string; date: string }>,
   }
-  const savedTrips: Array<never> = []
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-dark-950 via-dark-900 to-dark-950">
-      {/* Navigation */}
-      <nav className="border-b border-dark-800 bg-dark-900/80 backdrop-blur-sm sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <Link href="/" className="flex items-center gap-2">
-              <Plane className="w-8 h-8 text-primary-600" />
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary-600 to-purple-600 bg-clip-text text-transparent">
-                Roamly
-              </span>
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/" className="text-dark-300 hover:text-dark-50 transition">
-                Home
-              </Link>
-              <Link href="/planner" className="text-dark-300 hover:text-dark-50 transition">
-                Plan Trip
-              </Link>
-              <Link href="/watches" className="text-dark-300 hover:text-dark-50 transition">
-                My Watches
-              </Link>
-              <Link href="/dashboard" className="text-primary-400 font-medium">
-                Dashboard
-              </Link>
-            </div>
+    <div className="app-shell">
+      <SiteHeader />
+
+      <div className="app-content py-8 md:py-10">
+        <div className="glass-panel p-6 md:p-8">
+          <div className="eyebrow">
+            <Radar className="h-3.5 w-3.5" />
+            Operator overview
           </div>
-        </div>
-      </nav>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-dark-50 mb-2">Your Travel Dashboard</h1>
-          <p className="text-lg text-dark-300">Track your trips and savings</p>
-        </div>
-
-        {/* Stats Grid */}
-        <div className="grid md:grid-cols-4 gap-6 mb-8">
-          {/* Total Trips */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="bg-primary-900/30 p-3 rounded-lg">
-                <Plane className="w-6 h-6 text-primary-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-dark-50">{stats.totalTripsPlanned}</div>
-                <div className="text-sm text-dark-300">Trips Planned</div>
-              </div>
-            </div>
-            <div className="text-xs text-dark-300 flex items-center gap-1">
-              <TrendingUp className="w-3 h-3" />
-              <span>No trips yet</span>
-            </div>
-          </div>
-
-          {/* Total Saved */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="bg-green-900/30 p-3 rounded-lg">
-                <DollarSign className="w-6 h-6 text-green-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-dark-50">${stats.totalSaved}</div>
-                <div className="text-sm text-dark-300">Total Saved</div>
-              </div>
-            </div>
-            <div className="text-xs text-dark-300">
-              Compared to average prices
-            </div>
-          </div>
-
-          {/* Average Score */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="bg-blue-900/30 p-3 rounded-lg">
-                <Award className="w-6 h-6 text-blue-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-dark-50">{stats.averageScore}</div>
-                <div className="text-sm text-dark-300">Avg. Score</div>
-              </div>
-            </div>
-            <div className="text-xs text-dark-300">
-              Quality of your bookings
-            </div>
-          </div>
-
-          {/* Recent Activity */}
-          <div className="bg-dark-800 border border-dark-700 rounded-xl shadow-sm p-6">
-            <div className="flex items-center gap-3 mb-3">
-              <div className="bg-purple-900/30 p-3 rounded-lg">
-                <Clock className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <div className="text-2xl font-bold text-dark-50">{stats.recentSearches.length}</div>
-                <div className="text-sm text-dark-300">Recent Searches</div>
-              </div>
-            </div>
-            <div className="text-xs text-dark-300">
-              Last 30 days
-            </div>
-          </div>
-        </div>
-
-        {/* Saved Trips Section */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-bold text-dark-50">Your Saved Trips</h2>
-            <Link
-              href="/planner"
-              className="flex items-center gap-2 bg-primary-600 text-white px-4 py-2 rounded-lg hover:bg-primary-700 transition"
-            >
-              <Plus className="w-4 h-4" />
-              New Trip
-            </Link>
-          </div>
-
-          {savedTrips.length === 0 && (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-8 text-center text-dark-300">
-              No saved trips yet. Start a search to create your first trip.
-            </div>
-          )}
-        </div>
-
-        {/* Recent Searches */}
-        <div>
-          <h2 className="text-2xl font-bold text-dark-50 mb-6">Recent Searches</h2>
-          {stats.recentSearches.length === 0 ? (
-            <div className="bg-dark-800 border border-dark-700 rounded-xl p-6 text-dark-300">
-              No recent searches yet.
-            </div>
-          ) : null}
-        </div>
-
-        {/* Quick Actions */}
-        <div className="mt-12 bg-gradient-to-r from-primary-600 to-purple-600 rounded-2xl p-8 text-white">
-          <h3 className="text-2xl font-bold mb-4">Ready for your next adventure?</h3>
-          <p className="mb-6 opacity-90">
-            Start planning your next trip and let our AI find the best options for you
+          <h1 className="mt-4 font-[family:var(--font-display)] text-3xl font-semibold text-white md:text-5xl">
+            Roamly dashboard
+          </h1>
+          <p className="mt-3 max-w-3xl text-slate-300">
+            This is the command center for trip searches, savings, and watch activity. The data
+            layer is still thin, but the layout now matches the watch-first product direction.
           </p>
-          <Link
-            href="/planner"
-            className="inline-flex items-center gap-2 bg-dark-700 text-primary-300 border border-primary-700/50 px-6 py-3 rounded-lg hover:bg-dark-600 transition font-semibold"
-          >
-            Plan New Trip
-            <ArrowRight className="w-5 h-5" />
-          </Link>
+        </div>
+
+        <div className="mt-6 grid gap-4 md:grid-cols-4">
+          <StatCard icon={<Plane className="h-5 w-5 text-sky-200" />} label="Trips planned" value={stats.totalTripsPlanned} />
+          <StatCard icon={<DollarSign className="h-5 w-5 text-emerald-200" />} label="Saved" value={`$${stats.totalSaved}`} />
+          <StatCard icon={<Target className="h-5 w-5 text-amber-200" />} label="Average score" value={stats.averageScore} />
+          <StatCard icon={<BellRing className="h-5 w-5 text-rose-200" />} label="Recent searches" value={stats.recentSearches.length} />
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-[1.2fr,0.8fr]">
+          <div className="soft-panel p-6">
+            <h2 className="text-xl font-semibold text-white">Saved trips</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              No saved trips yet. Once searches and watchlists are persisted more broadly, this
+              area can become the place to resume or compare tracked itineraries.
+            </p>
+            <Link href="/planner" className="action-primary mt-6">
+              Start a trip
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
+
+          <div className="soft-panel p-6">
+            <h2 className="text-xl font-semibold text-white">Recent watch activity</h2>
+            <p className="mt-2 text-sm leading-6 text-slate-400">
+              Hook this panel up next to real watch runs, matched alerts, and latest route checks.
+            </p>
+            <Link href="/watches" className="action-secondary mt-6">
+              Open watches
+              <ArrowRight className="h-4 w-4" />
+            </Link>
+          </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function StatCard({
+  icon,
+  label,
+  value,
+}: {
+  icon: React.ReactNode
+  label: string
+  value: string | number
+}) {
+  return (
+    <div className="soft-panel p-5">
+      <div className="mb-4 inline-flex rounded-2xl border border-white/10 bg-white/8 p-3">
+        {icon}
+      </div>
+      <div className="text-3xl font-semibold text-white">{value}</div>
+      <div className="mt-1 text-sm text-slate-400">{label}</div>
     </div>
   )
 }

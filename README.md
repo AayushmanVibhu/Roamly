@@ -1,6 +1,6 @@
 # Roamly ✈️
 
-> AI-powered travel decision platform that helps users find the best travel options based on constraints like budget, preferences, baggage needs, and convenience.
+> Flight watch platform that tracks routes against a traveler’s target constraints and alerts them when the right fare finally appears.
 
 ![Roamly](https://img.shields.io/badge/status-MVP-blue)
 ![Next.js](https://img.shields.io/badge/Next.js-14.1-black)
@@ -9,8 +9,10 @@
 
 ## 🎯 Overview
 
-Roamly is not just another flight search engine. It's an intelligent travel companion that helps users **decide when an option is actually worth taking** by providing:
+Roamly is not just another flight search engine. It's an intelligent travel watch platform that helps users **stop manually checking fares** by:
 
+- **Creating persistent watches**: Save route, date, budget, and preference constraints
+- **Background monitoring**: Recheck live flight options automatically until a match appears
 - **AI-Powered Recommendations**: Smart scoring system that evaluates flights based on price, convenience, comfort, and reliability
 - **Price Intelligence**: Real-time analysis comparing current prices to historical averages with trend predictions
 - **Decision Support**: Clear explanations of why each option is worth considering or avoiding

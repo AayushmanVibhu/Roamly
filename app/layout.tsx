@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter, Space_Grotesk } from 'next/font/google'
+import { Manrope, Space_Grotesk } from 'next/font/google'
 import './globals.css'
 
-const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
+const manrope = Manrope({ subsets: ['latin'], variable: '--font-sans' })
 const spaceGrotesk = Space_Grotesk({ subsets: ['latin'], variable: '--font-display' })
 
 export const metadata: Metadata = {
@@ -21,7 +21,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#3b82f6',
+  themeColor: '#0b1530',
 }
 
 export default function RootLayout({
@@ -31,7 +31,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${spaceGrotesk.variable} ${inter.className} bg-dark-950 text-dark-50`}>
+      <body className={`${manrope.variable} ${spaceGrotesk.variable} ${manrope.className} bg-dark-950 text-dark-50 antialiased`}>
         {children}
       </body>
     </html>

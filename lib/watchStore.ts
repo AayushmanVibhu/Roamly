@@ -2,6 +2,7 @@ import { mkdir, readFile, writeFile } from 'fs/promises'
 import path from 'path'
 import { randomUUID } from 'crypto'
 import { getDbPool } from '@/lib/db'
+import { clampCheckInterval, getEffectiveCheckIntervalMinutes } from '@/lib/watchIntervals'
 import { TravelWatch, TravelWatchStatus, TripPreferences } from '@/types'
 
 interface CreateWatchInput {
@@ -15,9 +16,6 @@ interface WatchFileShape {
   watches: TravelWatch[]
 }
 
-const DEFAULT_CHECK_INTERVAL_MINUTES = 60
-const MIN_CHECK_INTERVAL_MINUTES = 5
-const MAX_CHECK_INTERVAL_MINUTES = 720
 const WATCH_TABLE = 'travel_watches'
 
 let dbSchemaReady = false
@@ -41,11 +39,6 @@ async function writeFileStore(data: WatchFileShape): Promise<void> {
   const storePath = getWatchStorePath()
   await mkdir(path.dirname(storePath), { recursive: true })
   await writeFile(storePath, JSON.stringify(data, null, 2), 'utf8')
-}
-
-function clampCheckInterval(minutes?: number): number {
-  if (!minutes || Number.isNaN(minutes)) return DEFAULT_CHECK_INTERVAL_MINUTES
-  return Math.max(MIN_CHECK_INTERVAL_MINUTES, Math.min(MAX_CHECK_INTERVAL_MINUTES, Math.round(minutes)))
 }
 
 async function getWatchDb() {
@@ -289,5 +282,5 @@ export async function shouldCheckWatch(watch: TravelWatch): Promise<boolean> {
   if (watch.status !== 'active') return false
   if (!watch.lastCheckedAt) return true
   const elapsedMs = Date.now() - new Date(watch.lastCheckedAt).getTime()
-  return elapsedMs >= watch.checkIntervalMinutes * 60_000
+  return elapsedMs >= getEffectiveCheckIntervalMinutes(watch) * 60_000
 }

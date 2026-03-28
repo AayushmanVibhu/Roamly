@@ -14,13 +14,16 @@ In your deployment platform (for example Vercel), set:
 
 ## 2) Cron schedule
 
-`vercel.json` includes a daily cron by default:
+`vercel.json` should call the checker every hour:
 
-- `GET /api/watches/check` at `0 9 * * *`
+- `GET /api/watches/check` at the top of every hour
 
-Vercel will call this route automatically.
+Hourly cron is safe because each watch decides whether it is due:
 
-> Note: On Vercel Hobby, cron jobs are limited to once per day. If you want hourly (or more frequent) checks, use Vercel Pro or an external scheduler that calls this endpoint with your secret.
+- far-away departures: every few hours
+- near departures: every hour
+
+If your hosting plan cannot run hourly cron, use an external scheduler that calls this endpoint with your secret.
 
 ## 3) Auth for cron calls
 
